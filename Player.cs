@@ -161,13 +161,27 @@ public class Player : Entity{
 	}
 
 	private Sprite UpdateSprite(){
-		if(isAttacking && Math.Abs(speed) < 0.3) return fire; 
 		if(isDead) return death;
+		if(isAttacking && Math.Abs(speed) < 0.3) return fire; 
 		if(Math.Abs(speed) > 0.3) return walk;
 		return stand;
 	}
 
+	public override void Die(){
+		base.Die();
+		isAttacking = false;
+	}
+
 	public override void Update(){
+		if(isDead){
+			if(doUpdateSprite){
+				doUpdateSprite = false;
+				_sprite = UpdateSprite();
+				_sprite.Trigger();
+			}
+			return;
+		}
+
 		if(autoaim.isAutoaiming == true){
 			if(autoaim.crosshair.isOn) autoaim.crosshair.Update();
 			float diff = Tools.GetAngleDifference(this.rotation, autoaim.rotation);
@@ -177,6 +191,17 @@ public class Player : Entity{
 
 		if(isKeyboardOn == true) HandleInput();
 		_sprite = UpdateSprite();
+	}
+
+	public override void IsHit(float damage, float rotation){
+		float radians = (float)(Math.PI/180)*rotation;
+
+		if(isDead) return;
+		
+		health += -(int)damage;
+		velRepulsion = new PointF((float)Math.Cos(rotation)*2, (float)Math.Sin(rotation)*2);
+
+		Blood.SprayBlood(r.Location, new PointF((float)Math.Cos(radians),(float)Math.Sin(radians)));
 	}
 
 	public void TakeItem(ItemDrop item){

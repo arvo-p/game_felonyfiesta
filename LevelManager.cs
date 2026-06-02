@@ -1,5 +1,4 @@
 public class LevelManager{
-
 	Environment env;
 	List<Enemy> managedEnemies = new List<Enemy>();
 	
@@ -12,6 +11,18 @@ public class LevelManager{
 
 	public LevelManager(){
 		env = Game.env;
+		NextDialogue();
+	}
+	
+	public bool isDialoguePlaying = false;
+	public Dialogue dia;
+	int dialogue_pointer = 0;
+    private void NextDialogue(){
+		int len = DialogueFootprints.Dialogues.Count;
+		if(dialogue_pointer > len - 1) return; // no more dialogues
+		dia = DialogueFootprints.Dialogues[(dialogue_pointer++)];
+		isDialoguePlaying = true;
+		dia.Play();
 	}
 
 	private void NextLevel(){
@@ -22,10 +33,13 @@ public class LevelManager{
 	}
 
 	public void Update(){
+ 		if(isDialoguePlaying && dia.isPlaying == false) isDialoguePlaying = false;
 		if(isLevelFinished == true){
 			if(!dtRest.HasValue) dtRest = DateTime.Now;
 			else if((DateTime.Now - dtRest.Value).TotalSeconds >= 10){
-				NextLevel();
+				if(dia.isPlaying == false && isDialoguePlaying)
+					NextLevel();              
+				else if(!isDialoguePlaying) NextDialogue();
 			}
 			return;
 		}

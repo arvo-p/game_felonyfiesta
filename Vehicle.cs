@@ -13,20 +13,20 @@ public class Vehicle : Entity{
 
 	public Vehicle(){
 		this.env = Game.env;
+		this.mass = 1000;
 		this.friction = 0.94f;
 		this.maxspeed = 23;
 		this.inverted_vectors = true;
 		
 		_sprite = new Sprite(Resources.Vehicle._car);
 		r.Location = new Point(600, 600);
-		r.Size = new Size((int)(100), (int)(200));
+		r.Size = new Size((int)(105-10), (int)(200-10));
 		mass = 900;
 		SetCollisionCircles();
 		setHealth(100);
 
 		props = new List<Prop>();
 		shadow = new Prop(Resources.Vehicle._carshadow, new RectangleF(0, 0, r.Width, r.Height), this.rotation);
-		props.Add(new Prop(Resources.Environments._smoke, new RectangleF(0, 80, 64, 64), this.rotation+90));
 	}
 
 	private void HandleInput(){
@@ -37,7 +37,9 @@ public class Vehicle : Entity{
 			LeaveCar();
 			return;
 		}
+		
 		if(owner == false) return;
+        if(isDead == true) return;
 
 		isTurning = 0;
 		if(Math.Abs(speed) > 1){
@@ -94,6 +96,19 @@ public class Vehicle : Entity{
 		passengers.Remove(passenger);
 		this.owner = false;
 		this.mykeyboard = null;
+	}
+
+	int countSmoke = 0;
+	public void ShockDamage(){
+   		if(this.speed <= 6) return;
+		Random rand = new Random();
+        health -= (int)((speed * mass) / 900f);
+		
+	   float x = (float)(rand.NextDouble() * 40);
+	   float y = (float)(rand.NextDouble() * 30) + 20;
+        
+		if(countSmoke++ < 5)
+			props.Add(new Prop(Resources.Environments._smoke, new RectangleF(x, y, 64, 64), this.rotation+90));
 	}
 
 	public override void Update(){

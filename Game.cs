@@ -19,6 +19,7 @@ public static class Game{
 		Resources.Font.Load();
 		BuildingsFootprint.Init();
 		ItemDropFootprints.Init();
+		DialogueFootprints.Init();
 
 		camera = new Camera();
 		new Environment();

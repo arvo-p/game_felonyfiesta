@@ -6,10 +6,13 @@ public class Environment{
 	public Map map;
 	public Player p;
 	public Crosshair crosshair;
-	public LevelManager levelManager = new LevelManager();
+	public LevelManager levelManager;
 
 	public ObjectsManager All = new ObjectsManager();
 	public List<Prop> props = new List<Prop>();
+
+	public bool isDialoguePlaying{get=>levelManager.isDialoguePlaying;}  
+	public Dialogue dialogue{get=>levelManager.dia;}
 
 	/* TODO
 	 * - Spaw area, level manager and regular spawn each 5 minutes if entity number < X
@@ -28,16 +31,16 @@ public class Environment{
 		p = new Player(crosshair);
 		Game.camera.Follow(p);
 
-		levelManager = new LevelManager();
-
 		All.Add(new Vehicle());
 		All.Add(p);
+
+		levelManager = new LevelManager();
 	}
 	
 	public void Update(){
 		levelManager.Update();
-		foreach(var obj in All.ToList()) obj.UpdateRoutine();
 		
+		foreach(var obj in All.ToList()) obj.UpdateRoutine();
 		if(props.Count() > 200) props.RemoveAt(0);
 	}
 
@@ -101,11 +104,20 @@ public class Environment{
 			var overlapInfo = GetCirclesCollisionOverlap(offset, distSq, radius, 0); 
 			PointF pushOut = new PointF(overlapInfo.direction.X * (overlapInfo.overlap + 0.2f), overlapInfo.direction.Y * (overlapInfo.overlap + 0.2f));
 			
-			if(mode == 0){ // Translation: push out of the tile
+			/* 
+			 * Mode 0 handles translation
+			 * Mode 1 handles rotation
+			 */
+			if(mode == 0){ 
+				/*
+				 * WallCollisionEvents is called before any correction
+				 * to the entity's position or velocity.
+				 */
+				WallCollisionEvents(parent); 
 				parent.speed *= -0.6f;
 				UpdatePosition(parent, pushOut);
 			}
-			else if(mode == 1){ // Rotation: rotate based on collision torque
+			else if(mode == 1){ 
 				float localX = closest.X - center.X;
 				float localY = closest.Y - center.Y;
 				// 2D Cross product (torque): r x F
@@ -165,9 +177,8 @@ public class Environment{
          entity.PutDown(true);
          entity.health -= (int)(Math.Abs(vehicle.speed) * 2f);
     
-         float radians = vehicle.rotation * DegToRad;
+         float radians = (vehicle.rotation+45) * DegToRad;
          PointF direction = new PointF(MathF.Cos(radians), MathF.Sin(radians));
-         //if (vehicle.speed < 0) { direction.X *= -1; direction.Y *= -1; }
          entity.TransferForce(new PointF(direction.X * vehicle.speed * 0.5f, direction.Y * vehicle.speed * 0.5f), vehicle.mass);
          Blood.SprayBlood(entity.center, direction);
     
@@ -188,7 +199,7 @@ public class Environment{
 
 			// Skip entities that shouldn't block movement (dead or run over by vehicles)
 			if (other is Entity entity){
-				if (entity.isDead) continue;
+				if (entity.isDead & entity is not Vehicle) continue;
 				if (sourceObject is Vehicle vehi) if(entity.isDown) continue;
 			}
 
@@ -278,6 +289,10 @@ public class Environment{
 		if(IsObjectColliding(obj, 0, AdjustCirclesOverlap, 1) != null) return;
 		obj.rotation = newRotation;
 		for(int i = 0; i < hitboxCount; i++) obj.hitboxes[i].center = centers[i];
+	}
+	
+	public void WallCollisionEvents(Object obj){
+    	if(obj is Vehicle v) v.ShockDamage();
 	}
 
 	public void Move(Object obj, PointF movement){

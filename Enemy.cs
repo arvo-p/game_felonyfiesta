@@ -1,9 +1,12 @@
-public class Enemy : Entity{
 
+using System.Media;
+public class Enemy : Entity{
 	public Sprite walk = null!;
 	public Sprite shoot = null!;  
 	public Sprite stand = null!;
 	public Sprite dead = null!;
+ 	
+	protected List<NativeAudioPlayer> soundsDeath;
 
 	protected Player local_player = null!;
 
@@ -12,7 +15,9 @@ public class Enemy : Entity{
 
 	protected bool isActionInProgress = false;
 	protected float aiming_rotation;
-	
+	protected float aiming_error = 0;
+
+	public float accuracy = 0.8f;
 	public float tAttack = 1;
 	public float tStun = 1;
 	
@@ -21,6 +26,8 @@ public class Enemy : Entity{
  
 	protected List<PointF>? currentPath = null;
 	DateTime dtRefreshPath=DateTime.Now;
+
+	private int damage = 10;
 	
 	public void Action(){
 		Entity target = local_player.inside==null?local_player:local_player.inside;
@@ -52,7 +59,10 @@ public class Enemy : Entity{
 		if(isActionInProgress){
 			tAttack+=-0.052f;
 			if(tAttack <= 0) isActionInProgress = false;
-			else return;
+			else {
+				aiming_rotation += aiming_error;
+				return;
+			}
 		}
 		
 		float distance = Tools.GetDistanceSquared(target.r.Location, this.r.Location);
@@ -65,8 +75,17 @@ public class Enemy : Entity{
 		}else{
 			if(_sprite != shoot) _sprite = shoot;
 			isActionInProgress = true;
+
+			aiming_error = (float)((Game.rand.NextDouble() * 2 - 1) * 30 * (1.0f - accuracy));
+			aiming_rotation += aiming_error;
+
 			tAttack = 1;
+			
 			_sprite.Trigger();
+
+			Object? victim = HitscanCheck(this.center, 400);   
+			if(victim != null && victim is Entity ent) ent.IsHit(damage, aiming_rotation);
+
 			speed = 0;
 		}
 	}
@@ -110,6 +129,9 @@ public class Enemy : Entity{
 				doUpdateSprite = false;
 				_sprite = UpdateSprite();
 				_sprite.Trigger();
+				
+				if(soundsDeath != null)
+			   	    soundsDeath[Game.rand.Next(0,soundsDeath.Count)].Play(); 
 			}
 			return;
 		}

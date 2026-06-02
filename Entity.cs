@@ -30,7 +30,7 @@ public class Entity : Object{
 	protected DateTime isDownTime = DateTime.Now;
 
 	public virtual void TryGetUp(){
-		if((DateTime.Now - isDownTime).TotalSeconds > 5)
+		if((DateTime.Now - isDownTime).TotalSeconds >= 5)
 			PutDown(false);
 	}
 

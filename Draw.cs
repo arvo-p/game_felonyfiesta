@@ -200,10 +200,10 @@ public class Draw{
 		var initialState = e.Graphics.Save();
 		
 		RectangleF r = ent.r;
-		float fakeHeight = ent.speed * 0.12f;
+		float fakeHeight = ent.speed * 0.16f;
 		float offset = 0;
 
-		if(ent.isTurning != 0) offset = ent.isTurning==1?-6:4;
+		if(ent.isTurning != 0) offset = ent.isTurning==1?-8:6;
 		if(ent.isAccelerating==1&&ent.speed>0.2){
 			r.Height *= ent.stretchFactor;
 			r.Width *= ent.squashFactor;
@@ -330,6 +330,9 @@ public class Draw{
 		// UI
 		
 		PrintAmmo(e);
+		if(env.isDialoguePlaying){
+         	e.Graphics.DrawImage(env.dialogue.nowhead.frame, 30, Game.windowHeight-230, 200, 200);
+		}
 
 		/*
 		 * DEBUG collision

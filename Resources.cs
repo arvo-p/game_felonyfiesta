@@ -118,6 +118,18 @@ public class Resources{
 		};
 	}
 	
+    public static class Heads{
+     	public static string[] _chillguy = {
+         	"Heads/chillguy0.png",
+         	"Heads/chillguy1.png",
+         	"Heads/chillguy2.png",
+		};
+	}
+	
+	public static class Dialogues{
+        public static string D1 = "Sounds/dialogue/1.wav"; 
+	}	
+
 	public static class UI{
 		public static string[] _ammopanel = {
 			"UI/ammunition.png"
@@ -161,6 +173,13 @@ public class Resources{
 		public static string _rocket = "Items/Item_rocket.png";
 		public static string _shells = "Items/Item_shells.png";
 		public static string _smallbullets= "Items/Item_smallbullets.png";
+	}
+	
+	public static class Sounds{
+     	public static string[] _thugdeath = {
+         	"Sounds/thugdeath1.wav",
+			"Sounds/thugdeath2.wav"
+		};
 	}
 
 	public static class Thug{
