@@ -34,6 +34,18 @@ public class TurnManager {
     private Enemy? currentActiveEnemy = null;
     public Player? currentActivePlayer = null;
 
+    public void Reset() {
+        currentState = TurnState.PlayerTurn;
+        playerState = PlayerTurnState.Selection;
+        playerAP = 100;
+        enemyAP = 100;
+        movementAmplitude = 0;
+        enemyQueue.Clear();
+        playerQueue.Clear();
+        currentActiveEnemy = null;
+        currentActivePlayer = null;
+    }
+
     public void Update() {
         if (Game.activeState != Game.State.Playing || !Game.isTurnBased)
             return;

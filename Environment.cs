@@ -125,7 +125,7 @@ public class Environment{
 				 * to the entity's position or velocity.
 				 */
 				WallCollisionEvents(parent); 
-				parent.speed *= -0.6f;
+				parent.speed *= 0.85f; // Gentle slowdown instead of aggressive bounce
 				UpdatePosition(parent, pushOut);
 			}
 			else if(mode == 1){ 
@@ -316,8 +316,26 @@ public class Environment{
 	public void Move(Object obj, PointF movement){
 		int countHitboxes = obj.hitboxes.Count;
 
-		if(countHitboxes == 1) movement = CheckRectangleTileCollision(obj.hitboxes[0], movement);
-		else foreach(var cc in obj.hitboxes) if(CheckCircleTileCollision(cc, movement, 0)) return;
+		if(countHitboxes == 1) {
+			movement = CheckRectangleTileCollision(obj.hitboxes[0], movement);
+		} else {
+			// Separate X and Y checks allow for sliding along walls
+			PointF moveX = new PointF(movement.X, 0);
+			foreach(var cc in obj.hitboxes) {
+				if(CheckCircleTileCollision(cc, moveX, 0)) {
+					movement.X = 0;
+					break;
+				}
+			}
+
+			PointF moveY = new PointF(0, movement.Y);
+			foreach(var cc in obj.hitboxes) {
+				if(CheckCircleTileCollision(cc, moveY, 0)) {
+					movement.Y = 0;
+					break;
+				}
+			}
+		}
 		
 		if(movement.X == 0 && movement.Y == 0) return;
 		

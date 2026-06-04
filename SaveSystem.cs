@@ -9,7 +9,7 @@ public static class SaveSystem{
 	public class SaveData{
 		public bool IsTurnBased{ get; set; }
 		public LevelData Level{ get; set; } = new();
-		public PlayerData Player{ get; set; } = new();
+		public List<PlayerData> Players{ get; set; } = new();
 		public List<NPCData> NPCs{ get; set; } = new();
 		public List<VehicleData> Vehicles{ get; set; } = new();
 		public List<ItemData> Items{ get; set; } = new();
@@ -74,7 +74,6 @@ public static class SaveSystem{
         var env = Game.env;
         var lm = env.levelManager;
         if(env.players.Count == 0) return;
-        var p = env.players[0];
 
         var data = new SaveData();
 		data.IsTurnBased = Game.isTurnBased;
@@ -86,19 +85,25 @@ public static class SaveSystem{
         data.Level.IsLevelFinished = lm.isLevelFinished;
         data.Level.DialoguePointer = lm.dialogue_pointer;
 
-        // Player Data
-        data.Player.X = p.r.X;
-        data.Player.Y = p.r.Y;
-        data.Player.Rotation = p.rotation;
-        data.Player.Speed = p.speed;
-        data.Player.Health = p.health;
-        data.Player.SelectedWeaponIndex = p.idxSelectedWeapon;
-        data.Player.Inventory.Grenades = p.inventory.grenades;
-        data.Player.Inventory.Bullets = p.inventory.bullets;
-        data.Player.Inventory.Batteries = p.inventory.batteries;
-        data.Player.Inventory.Rockets = p.inventory.rockets;
-        data.Player.Inventory.Shells = p.inventory.shells;
-        data.Player.Inventory.SmallBullets = p.inventory.smallbullets;
+        // Players Data
+        foreach(var p in env.players){
+            data.Players.Add(new PlayerData{
+                X = p.r.X,
+                Y = p.r.Y,
+                Rotation = p.rotation,
+                Speed = p.speed,
+                Health = p.health,
+                SelectedWeaponIndex = p.idxSelectedWeapon,
+                Inventory = new InventoryData{
+                    Grenades = p.inventory.grenades,
+                    Bullets = p.inventory.bullets,
+                    Batteries = p.inventory.batteries,
+                    Rockets = p.inventory.rockets,
+                    Shells = p.inventory.shells,
+                    SmallBullets = p.inventory.smallbullets
+                }
+            });
+        }
 
         // Entities
         foreach(var npc in env.All.Entities.NPCs){
@@ -151,16 +156,13 @@ public static class SaveSystem{
 		Game.isTurnBased = data.IsTurnBased;
 		var env = Game.env;
 		var lm = env.levelManager;
-		if(env.players.Count == 0) return;
-		var p = env.players[0];
-
+		
 		env.All.Objects.Clear();
 		env.All.Items.Clear();
 		env.All.Entities.NPCs.Clear();
 		env.All.Entities.Vehicles.Clear();
-		
 		env.All.Entities.Players.Clear();
-		env.All.Entities.Players.Add(p);
+		env.players.Clear();
 		
 		lm.managedEnemies.Clear();
 
@@ -170,21 +172,30 @@ public static class SaveSystem{
 		lm.isLevelFinished = data.Level.IsLevelFinished;
 		lm.dialogue_pointer = data.Level.DialoguePointer;
 
-		p.r.X = data.Player.X;
-		p.r.Y = data.Player.Y;
-		p.rotation = data.Player.Rotation;
-		p.speed = data.Player.Speed;
-		p.health = data.Player.Health;
-		p.idxSelectedWeapon =(short)data.Player.SelectedWeaponIndex;
-		p.inventory.grenades = data.Player.Inventory.Grenades;
-		p.inventory.bullets = data.Player.Inventory.Bullets;
-		p.inventory.batteries = data.Player.Inventory.Batteries;
-		p.inventory.rockets = data.Player.Inventory.Rockets;
-		p.inventory.shells = data.Player.Inventory.Shells;
-		p.inventory.smallbullets = data.Player.Inventory.SmallBullets;
-		p.PositionUpdated();
-		p.hitboxes.Clear();
-		p.SetCollisionCircles();
+        foreach(var pData in data.Players){
+            Player p = new Player(env.crosshair);
+            p.r.X = pData.X;
+            p.r.Y = pData.Y;
+            p.rotation = pData.Rotation;
+            p.speed = pData.Speed;
+            p.health = pData.Health;
+            p.isDead = p.health <= 0;
+            p.idxSelectedWeapon = (short)pData.SelectedWeaponIndex;
+            p.inventory.grenades = pData.Inventory.Grenades;
+            p.inventory.bullets = pData.Inventory.Bullets;
+            p.inventory.batteries = pData.Inventory.Batteries;
+            p.inventory.rockets = pData.Inventory.Rockets;
+            p.inventory.shells = pData.Inventory.Shells;
+            p.inventory.smallbullets = pData.Inventory.SmallBullets;
+            p.PositionUpdated();
+            p.hitboxes.Clear();
+            p.SetCollisionCircles();
+            
+            env.players.Add(p);
+            env.All.Add(p);
+        }
+
+		if(env.players.Count > 0) Game.camera.Follow(env.players[0]);
 
 		foreach(var npcData in data.NPCs){
 			Enemy? npc = null;
@@ -204,6 +215,9 @@ public static class SaveSystem{
 				lm.managedEnemies.Add(npc);
             }
 		}
+
+        Game.turnManager.Reset();
+        if (Game.isTurnBased) Game.turnManager.EndEnemiesTurn();
 
             // Restore Vehicles
             foreach(var vData in data.Vehicles){

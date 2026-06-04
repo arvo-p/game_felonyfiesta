@@ -1,4 +1,5 @@
 {
+  "IsTurnBased": true,
   "Level": {
     "WaveMaxEnemies": 30,
     "WaveRemaining": 25,
@@ -6,71 +7,89 @@
     "IsLevelFinished": false,
     "DialoguePointer": 1
   },
-  "Player": {
-    "X": 160.5082,
-    "Y": 125.768875,
-    "Rotation": 49,
-    "Speed": 4.8986588,
-    "Health": 100,
-    "SelectedWeaponIndex": 0,
-    "Inventory": {
-      "Grenades": 10,
-      "Bullets": 128,
-      "Batteries": 30,
-      "Rockets": 5,
-      "Shells": 12,
-      "SmallBullets": 0
+  "Players": [
+    {
+      "X": 1270,
+      "Y": 113,
+      "Rotation": 100,
+      "Speed": 0,
+      "Health": 100,
+      "SelectedWeaponIndex": 0,
+      "Inventory": {
+        "Grenades": 10,
+        "Bullets": 128,
+        "Batteries": 30,
+        "Rockets": 5,
+        "Shells": 12,
+        "SmallBullets": 0
+      }
+    },
+    {
+      "X": 1022,
+      "Y": 133,
+      "Rotation": 0,
+      "Speed": 0,
+      "Health": 100,
+      "SelectedWeaponIndex": 0,
+      "Inventory": {
+        "Grenades": 10,
+        "Bullets": 128,
+        "Batteries": 30,
+        "Rockets": 5,
+        "Shells": 12,
+        "SmallBullets": 0
+      }
     }
-  },
+  ],
   "NPCs": [
     {
-      "Type": "Merc",
-      "X": 950.74396,
-      "Y": 416.9274,
+      "Type": "Thug",
+      "X": 2247,
+      "Y": 851,
       "Width": 64,
       "Height": 64,
-      "Rotation": 200.45624,
-      "Speed": 2.1,
+      "Rotation": 0,
+      "Speed": 0,
       "Health": 100
     },
     {
-      "Type": "Merc",
-      "X": 930.6128,
-      "Y": 354.27298,
+      "Type": "Doctor",
+      "X": 249,
+      "Y": 729,
       "Width": 64,
       "Height": 64,
-      "Rotation": 196.80968,
-      "Speed": 2.1,
+      "Rotation": 0,
+      "Speed": 0,
       "Health": 100
     },
     {
       "Type": "Thug",
-      "X": 686.39,
-      "Y": 647.10126,
+      "X": 2270,
+      "Y": 753,
       "Width": 64,
       "Height": 64,
-      "Rotation": 224.86179,
-      "Speed": 2.1,
+      "Rotation": 0,
+      "Speed": 0,
       "Health": 100
     },
     {
-      "Type": "Doctor",
-      "X": 1055.8247,
-      "Y": 641.1802,
+      "Type": "Thug",
+      "X": 286,
+      "Y": 629,
       "Width": 64,
       "Height": 64,
-      "Rotation": 210.06926,
-      "Speed": 2.1,
+      "Rotation": 0,
+      "Speed": 0,
       "Health": 100
     },
     {
-      "Type": "Doctor",
-      "X": 1122.8871,
-      "Y": 551.22064,
+      "Type": "Thug",
+      "X": 2355,
+      "Y": 950,
       "Width": 64,
       "Height": 64,
-      "Rotation": 204.02263,
-      "Speed": 2.1,
+      "Rotation": 0,
+      "Speed": 0,
       "Health": 100
     }
   ],
