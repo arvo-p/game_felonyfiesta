@@ -165,6 +165,7 @@ public partial class Form1 : Form{
 					c.Enabled = false;
 				}
 
+        		Game.turnManager.Reset();
 				Game.activeState = Game.State.Playing;
 				Game.New(count);
 			};
