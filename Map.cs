@@ -43,7 +43,7 @@ public class Map{
 		gmap = BuildMapImages(map, secondLayer, tileMap);
 		CreateBuildings(buildingsLayer);
 		
-		this.worldsize = new Size(dimension.width*tileRenderDimension, dimension.height*tileRenderDimension);
+		this.worldsize = new Size(dimension.height * tileRenderDimension, dimension.width * tileRenderDimension);
 	}
 
 	void CreateBuildings(int[,] map){

@@ -4,7 +4,7 @@ public class Environment{
 
 	public WeaponFootprints weaponFootprints = new WeaponFootprints();
 	public Map map;
-	public Player p;
+	public List<Player> players = new List<Player>();
 	public Crosshair crosshair;
 	public LevelManager levelManager;
 
@@ -14,27 +14,32 @@ public class Environment{
 	public bool isDialoguePlaying{get=>levelManager.isDialoguePlaying;}  
 	public Dialogue dialogue{get=>levelManager.dia;}
 
-	/* TODO
-	 * - Spaw area, level manager and regular spawn each 5 minutes if entity number < X
-	 * - Damage and all that
-	 * - Car collision and run over
-	 * - Pick up items
-	 * - Sounds
-	 */
-
-	public Environment(){
+	public Environment(int playerCount = 1){
 		Game.env = this;
 		map = new Map(new string[]{"Resources/Tiles/test_Background.csv","Resources/Tiles/test_Decorations.csv",
 				"Resources/Tiles/test_Collisions.csv","Resources/Tiles/test_Buildings.csv"}, "Resources/Tiles/tilesheet.png");
 
 		crosshair = new Crosshair(Resources.UI._crosshair1,Resources.UI._crosshair2);
-		p = new Player(crosshair);
-		Game.camera.Follow(p);
+		levelManager = new LevelManager();
+		
+		// Initial spawn point for the squad
+		PointF baseSpawn = levelManager.SpawnCoordinates(new PointF(2000, 2000), 1000);
+
+		for(int i = 0; i < playerCount; i++){
+			Player p = new Player(crosshair);
+
+			PointF pSpawn = levelManager.SpawnCoordinates(baseSpawn, 150);
+			p.r.Location = pSpawn;
+			p.PositionUpdated();
+			p.SetCollisionCircles();
+
+			players.Add(p);
+			All.Add(p);
+		}
+
+		if(players.Count > 0) Game.camera.Follow(players[0]);
 
 		All.Add(new Vehicle());
-		All.Add(p);
-
-		levelManager = new LevelManager();
 	}
 	
 	public void Update(){
@@ -42,6 +47,12 @@ public class Environment{
 		
 		foreach(var obj in All.ToList()) obj.UpdateRoutine();
 		if(props.Count() > 200) props.RemoveAt(0);
+
+		if (players.Count > 0 && players.All(p => p.isDead)) {
+			if (Game.activeState == Game.State.Playing) {
+				Game.activeState = Game.State.GameOver;
+			}
+		}
 	}
 
 	private const float DegToRad = MathF.PI / 180f;
@@ -144,9 +155,16 @@ public class Environment{
 		int endX = (int)((cc.center.X + mov.X + cc.radius) / tileSize);
 		int endY = (int)((cc.center.Y + mov.Y + cc.radius) / tileSize);
 		
-		for(int x = startX; x <= endX; x++)
-			for(int y = startY; y <= endY; y++)
+		int mapW = map.collision.GetLength(0);
+		int mapH = map.collision.GetLength(1);
+
+		for(int x = startX; x <= endX; x++){
+			if(x < 0 || x >= mapW) continue;
+			for(int y = startY; y <= endY; y++){
+				if(y < 0 || y >= mapH) continue;
 				if(map.collision[x, y] == 1 && ResolveCircleTileCollision(cc, x, y, mode)) return true;
+			}
+		}
 
 		return false;
 	}
@@ -175,7 +193,7 @@ public class Environment{
 
   	private void RunOverEntity(Vehicle vehicle, Entity entity){
          entity.PutDown(true);
-         entity.health -= (int)(Math.Abs(vehicle.speed) * 2f);
+         entity.IsHit((int)(Math.Abs(vehicle.speed) * 2f), vehicle.rotation, vehicle);
     
          float radians = (vehicle.rotation+45) * DegToRad;
          PointF direction = new PointF(MathF.Cos(radians), MathF.Sin(radians));

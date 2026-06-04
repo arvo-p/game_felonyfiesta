@@ -1,12 +1,14 @@
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 
 public class Keyboard{
 
-	[DllImport("user32.dll")]
+    [DllImport("user32.dll")]
     private static extern short GetAsyncKeyState(int vkey);
-	
-	[DllImport("user32.dll")]
+    
+    [DllImport("user32.dll")]
     private static extern IntPtr GetForegroundWindow();
 
     [DllImport("user32.dll")]
@@ -15,52 +17,62 @@ public class Keyboard{
     [DllImport("kernel32.dll")]
     private static extern uint GetCurrentProcessId();
 
-	private const int KEY_PRESSED = 0x8000;
+    private const int KEY_PRESSED = 0x8000;
 
-	List<Keys> registeredkeys = new List<Keys>();
-	List<Keys> keysPressed = new List<Keys>();
-	List<Keys> keysPressedOnce = new List<Keys>();
+    List<Keys> registeredkeys = new List<Keys>();
+    List<Keys> keysPressed = new List<Keys>();
+    List<Keys> keysPressedOnce = new List<Keys>();
+    List<Keys> keysReleased = new List<Keys>();
 
-	public Keyboard(Keys[] keys){
-		foreach(var key in keys){
-			registeredkeys.Add(key);
-		}
-	}
+    public Keyboard(Keys[] keys){
+        foreach(var key in keys){
+            registeredkeys.Add(key);
+        }
+    }
 
-	public void ReadKeys(){
-		if (!IsWindowFocused()) {
-			keysPressed.Clear();
-			keysPressedOnce.Clear();
-			return;
-		}
+    public void ReadKeys(){
+        keysReleased.Clear();
 
-		foreach(Keys k in registeredkeys){
-			if((GetAsyncKeyState((int)k) & KEY_PRESSED) != 0){
-				if(keysPressed.Contains(k) == false){
-					keysPressed.Add(k);
-					keysPressedOnce.Add(k);
-				}
-			}else{
-				keysPressed.Remove(k);
-				keysPressedOnce.Remove(k);
-			}
-		}
-	}
+        if (!IsWindowFocused()) {
+            keysPressed.Clear();
+            keysPressedOnce.Clear();
+            return;
+        }
 
-	private bool IsWindowFocused() {
-		IntPtr activatedHandle = GetForegroundWindow();
-		if (activatedHandle == IntPtr.Zero) return false;
+        foreach(Keys k in registeredkeys){
+            if((GetAsyncKeyState((int)k) & KEY_PRESSED) != 0){
+                if(keysPressed.Contains(k) == false){
+                    keysPressed.Add(k);
+                    keysPressedOnce.Add(k);
+                }
+            }else{
+                if(keysPressed.Contains(k)){
+                    keysReleased.Add(k);
+                }
+                keysPressed.Remove(k);
+                keysPressedOnce.Remove(k);
+            }
+        }
+    }
 
-		uint procId;
-		GetWindowThreadProcessId(activatedHandle, out procId);
-		return procId == GetCurrentProcessId();
-	}
+    private bool IsWindowFocused() {
+        IntPtr activatedHandle = GetForegroundWindow();
+        if (activatedHandle == IntPtr.Zero) return false;
 
-	public bool GetKey(Keys k){
-		return keysPressed.Contains(k);
-	}
+        uint procId;
+        GetWindowThreadProcessId(activatedHandle, out procId);
+        return procId == GetCurrentProcessId();
+    }
 
-	public bool GetKeyOnce(Keys k){
-		return keysPressedOnce.Remove(k);
-	}
+    public bool GetKey(Keys k){
+        return keysPressed.Contains(k);
+    }
+
+    public bool GetKeyOnce(Keys k){
+        return keysPressedOnce.Remove(k);
+    }
+
+    public bool GetKeyUp(Keys k){
+        return keysReleased.Contains(k);
+    }
 }

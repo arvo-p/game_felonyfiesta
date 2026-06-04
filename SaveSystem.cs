@@ -7,6 +7,7 @@ using System.Text.Json;
 
 public static class SaveSystem{
 	public class SaveData{
+		public bool IsTurnBased{ get; set; }
 		public LevelData Level{ get; set; } = new();
 		public PlayerData Player{ get; set; } = new();
 		public List<NPCData> NPCs{ get; set; } = new();
@@ -72,9 +73,11 @@ public static class SaveSystem{
     public static void Save(string filePath){
         var env = Game.env;
         var lm = env.levelManager;
-        var p = env.p;
+        if(env.players.Count == 0) return;
+        var p = env.players[0];
 
         var data = new SaveData();
+		data.IsTurnBased = Game.isTurnBased;
 
         // Level Data
         data.Level.WaveMaxEnemies = lm.waveMaxEnemies;
@@ -145,9 +148,11 @@ public static class SaveSystem{
 		var data = JsonSerializer.Deserialize<SaveData>(json);
 		if(data == null) return;
 
+		Game.isTurnBased = data.IsTurnBased;
 		var env = Game.env;
 		var lm = env.levelManager;
-		var p = env.p;
+		if(env.players.Count == 0) return;
+		var p = env.players[0];
 
 		env.All.Objects.Clear();
 		env.All.Items.Clear();

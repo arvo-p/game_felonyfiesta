@@ -20,10 +20,11 @@ public class Player : Entity{
 	public bool isKeyboardOn = true;
 	
 	
+	public int score = 0;
 	public Player(Crosshair crosshair){
 		this.env = Game.env;
 
-		mykeyboard = new Keyboard(new Keys[]{Keys.Z, Keys.Q, Keys.S, Keys.D, Keys.E, Keys.Space, Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.R});
+		mykeyboard = new Keyboard(new Keys[]{Keys.Z, Keys.Q, Keys.S, Keys.D, Keys.E, Keys.Space, Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.R, Keys.Enter, Keys.Tab});
 		autoaim = new Autoaim(this, crosshair);
 
 		LoadSprites();
@@ -33,7 +34,7 @@ public class Player : Entity{
 		setHealth(100);
 	
 		r.Location = new Point(0, 0);
-		r.Size = new Size(64, 64);
+		r.Size = new Size(60, 60);
 		mass = 90;
 		SetCollisionCircles();
 
@@ -70,10 +71,10 @@ public class Player : Entity{
 			
 			if(selectedWeapon.type == Weapon.Type.Gun){
 				victim = HitscanCheck(this.center, 400);   
-				if(lastGunHitSuccessful = (victim != null)) victim!.IsHit(selectedWeapon.damage, rotation);
+				if(lastGunHitSuccessful = (victim != null)) victim!.IsHit(selectedWeapon.damage, rotation, this);
 			}else{
 				victim = env.IsObjectColliding(this, 13f, null!, 0);
-				if(victim != null) victim!.IsHit(selectedWeapon.damage, rotation);
+				if(victim != null) victim!.IsHit(selectedWeapon.damage, rotation, this);
 			}
             return;
 		}
@@ -81,13 +82,18 @@ public class Player : Entity{
 	   	sprite.Trigger();
 	   	_sprite = meleethrow;
 		victim = env.IsObjectColliding(this, 13f, null!, 0);
-		if(victim != null) victim!.IsHit(15, rotation);
+		if(victim != null) victim!.IsHit(15, rotation, this);
 
 		return;
 	}
 
 	private void HandleInput(){
 		mykeyboard.ReadKeys();
+
+		if (Game.isTurnBased){
+			HandleTurnBasedInput();
+			return;
+		}
 		
 		if(mykeyboard.GetKeyOnce(Keys.R))
 			if(selectedWeapon != null) selectedWeapon.Reload();
@@ -128,7 +134,7 @@ public class Player : Entity{
 		if(mykeyboard.GetKey(Keys.Space)){
 			if(speed < 0.3){
 				if(!(autoaim.isAutoaiming == true && autoaim.crosshair.isLockedOnTarget == false)){ //test
-					if(lastGunHitSuccessful == false && selectedWeapon.type != Weapon.Type.Melee){
+					if(lastGunHitSuccessful == false && selectedWeapon != null && selectedWeapon.type != Weapon.Type.Melee){
 						autoaim.UpdateList();
 						if(!autoaim.SelectNext(0))
 						StartAttack();
@@ -143,6 +149,82 @@ public class Player : Entity{
 		if(mykeyboard.GetKeyOnce(Keys.E)) if(ActionKey()) return;
 	
 		speed = Math.Clamp(speed, -15, 15);
+	}
+
+	private void HandleTurnBasedInput(){
+		var tm = Game.turnManager;
+ 		if(tm.currentActivePlayer != this || tm.currentState != TurnManager.TurnState.PlayerTurn) return; //not player's turn
+
+		if(isAttacking){
+			if(selectedWeapon != null && selectedWeapon.sprite.isAnimationFinished){
+				selectedWeapon.EndShoot();
+				isAttacking = false;
+			}
+			return;
+		}
+
+		if(tm.playerState == TurnManager.PlayerTurnState.Selection){
+			// Rotate player (and arrow follows)
+			if(mykeyboard.GetKey(Keys.Q)) this.rotation -= 5;
+			if(mykeyboard.GetKey(Keys.D)) this.rotation += 5;
+
+			// Amplitude
+			if(mykeyboard.GetKey(Keys.Z)) tm.movementAmplitude = Math.Min(Math.Min(50, tm.movementAmplitude + 1), tm.playerAP/2);
+			if(mykeyboard.GetKey(Keys.S)) tm.movementAmplitude = Math.Max(0, tm.movementAmplitude - 1);
+
+			// Confirm Move
+			if(mykeyboard.GetKeyOnce(Keys.Enter) && tm.movementAmplitude > 0){
+				int cost = (int)(tm.movementAmplitude * 2);
+				if(tm.playerAP >= cost){
+					this.speed = tm.movementAmplitude/3; 
+					tm.playerAP -= cost;
+				}else tm.playerAP = 0;
+				tm.playerState = TurnManager.PlayerTurnState.Moving;
+				tm.movementAmplitude = 0;
+			}
+
+			// Enter Aiming Mode
+			if(mykeyboard.GetKeyOnce(Keys.Space)){
+				autoaim.UpdateList();
+				if(autoaim.SelectNext(0)) tm.playerState = TurnManager.PlayerTurnState.Aiming;
+			}
+		}
+		else if(tm.playerState == TurnManager.PlayerTurnState.Aiming){
+			// Cycle targets
+			if(mykeyboard.GetKeyOnce(Keys.Q)) autoaim.SelectNext(-1);
+			if(mykeyboard.GetKeyOnce(Keys.D)) autoaim.SelectNext(1);
+
+			// Back to movement mode
+			if(mykeyboard.GetKeyOnce(Keys.Space)){
+				autoaim.Set(false);
+				tm.playerState = TurnManager.PlayerTurnState.Selection;
+			}
+
+			// Confirm Shot
+			int cost = 20;
+			if(mykeyboard.GetKeyOnce(Keys.Enter)){
+				if(tm.playerAP > 0){
+					StartAttack();
+					tm.playerAP -= cost;
+					tm.playerState = TurnManager.PlayerTurnState.Aiming;
+				}else{
+					tm.playerState = TurnManager.PlayerTurnState.Selection;
+					autoaim.Set(false);
+				}
+			}
+		}
+
+		// Free actions (Weapon switching)
+		if(mykeyboard.GetKeyOnce(Keys.D1)) idxSelectedWeapon = 0;
+		if(mykeyboard.GetKeyOnce(Keys.D2)) idxSelectedWeapon = 1;
+		if(mykeyboard.GetKeyOnce(Keys.D3)) idxSelectedWeapon = 2;
+		if(mykeyboard.GetKeyOnce(Keys.D4)) idxSelectedWeapon = 3;
+
+		// End Turn manually
+		if(mykeyboard.GetKeyUp(Keys.Tab)){
+            tm.playerAP = 0;
+			tm.playerState = TurnManager.PlayerTurnState.Moving;
+		}
 	}
 
 	private bool ActionKey(){

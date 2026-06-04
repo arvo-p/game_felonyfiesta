@@ -388,6 +388,7 @@ public class Draw{
 		
 		PrintAmmo(e);
 		PrintMinimap(e);
+		if (Game.isTurnBased) Game.turnManager.Draw(e.Graphics);
 		if(env.isDialoguePlaying){
          	e.Graphics.DrawImage(env.dialogue.nowhead.frame, 30, Game.windowHeight-230, 200, 200);
 		}

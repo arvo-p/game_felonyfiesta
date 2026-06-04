@@ -1,17 +1,17 @@
 {
   "Level": {
     "WaveMaxEnemies": 30,
-    "WaveRemaining": 24,
+    "WaveRemaining": 25,
     "WaveSimultaneousMax": 5,
     "IsLevelFinished": false,
     "DialoguePointer": 1
   },
   "Player": {
-    "X": 778.0901,
-    "Y": 321.3362,
-    "Rotation": 339,
-    "Speed": 1.1532269,
-    "Health": 90,
+    "X": 160.5082,
+    "Y": 125.768875,
+    "Rotation": 49,
+    "Speed": 4.8986588,
+    "Health": 100,
     "SelectedWeaponIndex": 0,
     "Inventory": {
       "Grenades": 10,
@@ -25,61 +25,51 @@
   "NPCs": [
     {
       "Type": "Merc",
-      "X": 1015.5764,
-      "Y": 696.8905,
+      "X": 950.74396,
+      "Y": 416.9274,
       "Width": 64,
       "Height": 64,
-      "Rotation": 237.51328,
+      "Rotation": 200.45624,
+      "Speed": 2.1,
+      "Health": 100
+    },
+    {
+      "Type": "Merc",
+      "X": 930.6128,
+      "Y": 354.27298,
+      "Width": 64,
+      "Height": 64,
+      "Rotation": 196.80968,
+      "Speed": 2.1,
+      "Health": 100
+    },
+    {
+      "Type": "Thug",
+      "X": 686.39,
+      "Y": 647.10126,
+      "Width": 64,
+      "Height": 64,
+      "Rotation": 224.86179,
       "Speed": 2.1,
       "Health": 100
     },
     {
       "Type": "Doctor",
-      "X": 905.0299,
-      "Y": 442.6191,
+      "X": 1055.8247,
+      "Y": 641.1802,
       "Width": 64,
       "Height": 64,
-      "Rotation": 269.64432,
-      "Speed": 0,
-      "Health": 95
-    },
-    {
-      "Type": "Doctor",
-      "X": 1023.13116,
-      "Y": 468.5473,
-      "Width": 64,
-      "Height": 64,
-      "Rotation": 232.27214,
-      "Speed": 0,
+      "Rotation": 210.06926,
+      "Speed": 2.1,
       "Health": 100
     },
     {
-      "Type": "Merc",
-      "X": 974.92596,
-      "Y": 426.8574,
-      "Width": 64,
-      "Height": 64,
-      "Rotation": 207.92145,
-      "Speed": -0.588245,
-      "Health": 95
-    },
-    {
-      "Type": "Merc",
-      "X": 900.13354,
-      "Y": 370.25107,
-      "Width": 64,
-      "Height": 64,
-      "Rotation": 203.1621,
-      "Speed": -9.2810515E-06,
-      "Health": 0
-    },
-    {
       "Type": "Doctor",
-      "X": 1350.5903,
-      "Y": 1062.6365,
+      "X": 1122.8871,
+      "Y": 551.22064,
       "Width": 64,
       "Height": 64,
-      "Rotation": 232.25146,
+      "Rotation": 204.02263,
       "Speed": 2.1,
       "Health": 100
     }
@@ -95,12 +85,5 @@
       "Health": 100
     }
   ],
-  "Items": [
-    {
-      "Type": "Weapon",
-      "Quantity": 2,
-      "X": 897.5092,
-      "Y": 381.7752
-    }
-  ]
+  "Items": []
 }

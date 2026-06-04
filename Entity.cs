@@ -40,8 +40,16 @@ public class Entity : Object{
 		if(state) isDownTime = DateTime.Now;
 	}
 
+	public Entity? lastAttacker = null;
+
 	public virtual void Die(){
 		isDead = true;
+		if (lastAttacker is Player p) {
+			p.score += 5;
+		}
+		else if (lastAttacker is Vehicle v && v.passengers.Count > 0 && v.passengers[0] is Player p2) {
+			p2.score += 5;
+		}
 	}
 	
 	public virtual void DropItem(){
@@ -94,5 +102,10 @@ public class Entity : Object{
 	}
 
 	public override void IsHit(float damage, float rotation){
+	}
+
+	public override void IsHit(float damage, float rotation, Entity? attacker){
+		lastAttacker = attacker;
+		IsHit(damage, rotation);
 	}
 }

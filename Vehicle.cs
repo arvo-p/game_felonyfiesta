@@ -1,7 +1,7 @@
 public class Vehicle : Entity{
 
 	Keyboard? mykeyboard;
-	List<Entity> passengers = new List<Entity>();
+	public List<Entity> passengers = new List<Entity>();
 	bool owner = false;
 
 	public float stretchFactor = 1.014f;
@@ -15,6 +15,7 @@ public class Vehicle : Entity{
 		this.env = Game.env;
 		this.mass = 1000;
 		this.friction = 0.94f;
+		this._friction_turnbased = 0.98f; // Higher glide for heavy vehicles
 		this.maxspeed = 23;
 		this.inverted_vectors = true;
 		

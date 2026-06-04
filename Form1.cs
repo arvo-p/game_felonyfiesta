@@ -9,6 +9,8 @@ public partial class Form1 : Form{
 
 	private List<Control> menuControls = new List<Control>();
 	private List<Control> pauseControls = new List<Control>();
+	private List<Control> gameOverControls = new List<Control>();
+	private List<Control> playerSelectControls = new List<Control>();
 	private Image? imgParallaxBack;
 	private Image? imgParallaxFore;
 	private Color themeColor = Color.FromArgb(180, 80, 255); // Electric Violet
@@ -38,17 +40,22 @@ public partial class Form1 : Form{
 		int menuX = (int)((windowWidth - menuW) / 2);
 		int menuY = (int)((windowHeight - menuH) / 2);
 
-		Button btnNewGame = CreateStyledButton("NEW GAME", menuX + 250, menuY + 230);
-		btnNewGame.Click += (s, e) => StartGame();
+		Button btnNewGame = CreateStyledButton("SINGLE-PLAYER", menuX + 250, menuY + 230);
+		btnNewGame.Click += (s, e) => StartGame(false);
 		this.Controls.Add(btnNewGame);
 		menuControls.Add(btnNewGame);
 
-		Button btnLoad = CreateStyledButton("LOAD", menuX + 250, menuY + 310);
+		Button btnNewGameTurn = CreateStyledButton("TURN-BASED", menuX + 250, menuY + 310);
+		btnNewGameTurn.Click += (s, e) => StartGame(true);
+		this.Controls.Add(btnNewGameTurn);
+		menuControls.Add(btnNewGameTurn);
+
+		Button btnLoad = CreateStyledButton("LOAD", menuX + 250, menuY + 390);
 		btnLoad.Click += (s, e) => LoadGame();
 		this.Controls.Add(btnLoad);
 		menuControls.Add(btnLoad);
 
-		Button btnExit = CreateStyledButton("EXIT", menuX + 250, menuY + 390);
+		Button btnExit = CreateStyledButton("EXIT", menuX + 250, menuY + 470);
 		btnExit.Click += (s, e) => Application.Exit();
 		this.Controls.Add(btnExit);
 		menuControls.Add(btnExit);
@@ -56,6 +63,115 @@ public partial class Form1 : Form{
 		foreach(var ctrl in menuControls) ctrl.BringToFront();
 
 		CreatePauseUI();
+		CreatePlayerSelectUI();
+		CreateGameOverUI();
+	}
+
+	private void CreateGameOverUI(){
+		int menuW = 600;
+		int menuH = 500;
+		int menuX = (windowWidth - menuW) / 2;
+		int menuY = (windowHeight - menuH) / 2;
+
+		Label lblGameOver = new Label();
+		lblGameOver.Text = "SQUAD WIPED";
+		if (Resources.Font._pfc.Families.Length > 0)
+			lblGameOver.Font = new Font(Resources.Font._pfc.Families[0], 42, FontStyle.Bold);
+		else
+			lblGameOver.Font = new Font("Arial", 42, FontStyle.Bold);
+
+		lblGameOver.ForeColor = Color.Red;
+		lblGameOver.BackColor = Color.Transparent;
+		lblGameOver.AutoSize = false;
+		lblGameOver.Size = new Size(menuW, 100);
+		lblGameOver.TextAlign = ContentAlignment.MiddleCenter;
+		lblGameOver.Location = new Point(menuX, menuY + 20);
+		lblGameOver.Visible = false;
+		this.Controls.Add(lblGameOver);
+		gameOverControls.Add(lblGameOver);
+
+		Button btnBackToMenu = CreateStyledButton("BACK TO MENU", menuX + 150, menuY + 400);
+		btnBackToMenu.Click += (s, e) => QuitToMenu();
+		btnBackToMenu.Visible = false;
+		this.Controls.Add(btnBackToMenu);
+		gameOverControls.Add(btnBackToMenu);
+	}
+
+	public void ShowGameOverUI(bool show){
+		foreach(var ctrl in gameOverControls) {
+			ctrl.Visible = show;
+			ctrl.Enabled = show;
+			if(show) ctrl.BringToFront();
+		}
+	}
+
+	private void CreatePlayerSelectUI(){
+		int menuW = 800;
+		int menuH = 400;
+		int menuX = (windowWidth - menuW) / 2 + 5;
+		int menuY = (windowHeight - menuH) / 2;
+
+		Label lblAsk = new Label();
+		lblAsk.Text = "SELECT SQUAD SIZE";
+		if(Resources.Font._pfc.Families.Length > 0){
+			lblAsk.Font = new Font(Resources.Font._pfc.Families[0], 28, FontStyle.Bold);
+		}else{
+			lblAsk.Font = new Font("Arial", 28, FontStyle.Bold);
+		}
+		lblAsk.ForeColor = themeColor;
+		lblAsk.BackColor = Color.Transparent;
+		lblAsk.AutoSize = false;
+		lblAsk.Size = new Size(menuW, 80);
+		lblAsk.TextAlign = ContentAlignment.MiddleCenter;
+		lblAsk.Location = new Point(menuX, menuY);
+		lblAsk.Visible = false;
+		this.Controls.Add(lblAsk);
+		playerSelectControls.Add(lblAsk);
+
+		for(int i = 1; i <= 3; i++){
+			int count = i;
+			Button btn = new Button();
+			btn.Text = i.ToString() + (i == 1 ? " PLAYER" : " PLAYERS");
+			btn.Size = new Size(180, 180);
+			btn.Location = new Point(menuX + 100 + (i-1) * 220, menuY + 120);
+			btn.FlatStyle = FlatStyle.Flat;
+			btn.FlatAppearance.BorderSize = 3;
+			btn.FlatAppearance.BorderColor = themeColor;
+			btn.ForeColor = Color.White;
+			btn.BackColor = Color.FromArgb(80, 20, 20, 30);
+			btn.Visible = false;
+			
+			if(Resources.Font._pfc.Families.Length > 0){
+				btn.Font = new Font(Resources.Font._pfc.Families[0], 14, FontStyle.Bold);
+			}else{
+				btn.Font = new Font("Arial", 14, FontStyle.Bold);
+			}
+
+			int originalY = btn.Location.Y;
+			btn.MouseEnter += (s, e) => { 
+				btn.BackColor = themeColor; 
+				btn.ForeColor = Color.Black; 
+				btn.Location = new Point(btn.Location.X, originalY - 15); 
+			};
+			btn.MouseLeave += (s, e) => { 
+				btn.BackColor = Color.FromArgb(80, 20, 20, 30); 
+				btn.ForeColor = Color.White; 
+				btn.Location = new Point(btn.Location.X, originalY); 
+			};
+			
+			btn.Click += (s, e) => {
+				foreach(var c in playerSelectControls){
+					c.Visible = false;
+					c.Enabled = false;
+				}
+
+				Game.activeState = Game.State.Playing;
+				Game.New(count);
+			};
+
+			this.Controls.Add(btn);
+			playerSelectControls.Add(btn);
+		}
 	}
 
 	private void CreatePauseUI(){
@@ -118,6 +234,7 @@ public partial class Form1 : Form{
 
 	private void QuitToMenu(){
 		ShowPauseMenu(false);
+		ShowGameOverUI(false);
 		Game.activeState = Game.State.Menu;
 		Game.End();
 		foreach(var ctrl in menuControls) {
@@ -149,13 +266,24 @@ public partial class Form1 : Form{
 		return btn;
 	}
 
-	private void StartGame(){
-		Game.New();
+	private void StartGame(bool turnBased){
+		Game.isTurnBased = turnBased;
+		
 		foreach(var ctrl in menuControls){
 			ctrl.Visible = false;
 			ctrl.Enabled = false;
 		}
-		Game.activeState = Game.State.Playing;
+
+		if(turnBased){
+			foreach(var ctrl in playerSelectControls){
+				ctrl.Visible = true;
+				ctrl.Enabled = true;
+				ctrl.BringToFront();
+			}
+		}else{
+			Game.New(1);
+			Game.activeState = Game.State.Playing;
+		}
 	}
 
 	private void LoadGame(){
@@ -214,7 +342,7 @@ public partial class Form1 : Form{
 	}
 	protected override void OnPaint(PaintEventArgs e){
        	e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-		if (Game.activeState == Game.State.Playing || Game.activeState == Game.State.Paused){
+		if (Game.activeState == Game.State.Playing || Game.activeState == Game.State.Paused || Game.activeState == Game.State.GameOver){
 			Game.draw?.Update(e);
 
 			if (Game.activeState == Game.State.Paused) {
@@ -235,6 +363,10 @@ public partial class Form1 : Form{
 				{
 					e.Graphics.DrawRectangle(p, menuRect);
 				}
+			}
+			else if (Game.activeState == Game.State.GameOver) {
+				ShowGameOverUI(true);
+				DrawLeaderboard(e.Graphics);
 			}
 		}
 		else {
@@ -308,4 +440,33 @@ public partial class Form1 : Form{
 		}
 	}
 
+	private void DrawLeaderboard(Graphics g) {
+		using (SolidBrush b = new SolidBrush(Color.FromArgb(200, 0, 0, 0))) {
+			g.FillRectangle(b, this.ClientRectangle);
+		}
+
+		int menuW = 600;
+		int menuH = 500;
+		int menuX = (windowWidth - menuW) / 2;
+		int menuY = (windowHeight - menuH) / 2;
+		Rectangle menuRect = new Rectangle(menuX, menuY, menuW, menuH);
+
+		using (SolidBrush b = new SolidBrush(Color.FromArgb(140, 25, 15, 15))) {
+			g.FillRectangle(b, menuRect);
+		}
+		using (Pen p = new Pen(Color.Red, 2)) {
+			g.DrawRectangle(p, menuRect);
+		}
+
+		using (Font scoreFont = new Font("Arial", 24, FontStyle.Bold)) {
+			g.DrawString("FINAL SCORES", scoreFont, Brushes.White, menuX + 180, menuY + 130);
+
+			if (Game.env != null) {
+				for (int i = 0; i < Game.env.players.Count; i++) {
+					string scoreText = $"PLAYER {i + 1}: {Game.env.players[i].score}";
+					g.DrawString(scoreText, scoreFont, Brushes.Yellow, menuX + 150, menuY + 200 + i * 50);
+				}
+			}
+		}
+	}
 }

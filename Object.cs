@@ -11,7 +11,13 @@ public class Object{
 	public float Height{get=>r.Height;}
 	public float speed;
 	public int mass=0;
-	protected float friction=0.7f;
+
+	protected float _friction = 0.7f;
+	protected float _friction_turnbased = 0.95f;
+	protected virtual float friction{
+		get => Game.isTurnBased ? _friction_turnbased : _friction;
+		set => _friction = value;
+	}
 
 	public List<Prop>? props = null;
 	protected bool inverted_vectors=false;
@@ -73,6 +79,10 @@ public class Object{
 
 	public virtual void IsHit(float damage, float rotation){
 
+	}
+
+	public virtual void IsHit(float damage, float rotation, Entity? attacker){
+		IsHit(damage, rotation);
 	}
 
 	public void PositionUpdated(){

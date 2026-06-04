@@ -108,6 +108,10 @@ public class Sprite{
      	this.slothFactor = s.slothFactor;
 	}
 
+	public Sprite Clone(){
+		return (Sprite)this.MemberwiseClone();
+	}
+
 	public void Trigger(Action NextFunction){
 		Trigger();
 		while(!isAnimationFinished);

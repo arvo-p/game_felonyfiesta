@@ -80,8 +80,11 @@ public class Weapon{
 	
 	#region ICloneable Members
 	public object Clone(Player owner){
-		this.owner = owner;
-		return this.MemberwiseClone();
+		Weapon w = (Weapon)this.MemberwiseClone();
+		w.owner = owner;
+		w.sprite = this.sprite.Clone();
+		if(this.icon != null) w.icon = this.icon.Clone();
+		return w;
 	}
 	#endregion
 

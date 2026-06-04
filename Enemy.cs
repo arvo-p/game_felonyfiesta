@@ -13,8 +13,8 @@ public class Enemy : Entity{
 	protected Pathfinding pathf = new Pathfinding();
 	protected List<Point>? path = null;
 
-	protected bool isActionInProgress = false;
-	protected float aiming_rotation;
+	public bool isActionInProgress = false;
+	internal float aiming_rotation;
 	protected float aiming_error = 0;
 
 	public float accuracy = 0.6f;
@@ -28,11 +28,28 @@ public class Enemy : Entity{
 	DateTime dtRefreshPath=DateTime.Now;
 
 	private int damage = 5;
+	private float shootCooldown = 0;
 	
-	public void Action(){
-		Entity target = local_player.inside==null?local_player:local_player.inside;
+	public Entity? GetNearestPlayer(){
+		Player? nearest = null;
+		float minDist = float.MaxValue;
+		foreach(var p in env.players){
+			if(p.isDead) continue;
+			float d = Tools.GetDistanceSquared(this.center, p.center);
+			if(d < minDist){
+				minDist = d;
+				nearest = p;
+			}
+		}
+		if(nearest == null) return null;
+		return nearest.inside == null ? nearest : nearest.inside;
+	}
 
-		if((dtRefreshPath-DateTime.Now).TotalSeconds > 1){
+	public void UpdateAI(){
+		Entity? target = GetNearestPlayer();
+		if(target == null) return;
+
+		if((DateTime.Now - dtRefreshPath).TotalSeconds > 1){
 			dtRefreshPath = DateTime.Now;
 			currentPath = pathf.FindPath((int)this.X, (int)this.Y, (int)target.X, (int)target.Y); 
 		}
@@ -45,6 +62,41 @@ public class Enemy : Entity{
 		PointF difference = new PointF(this.Y-nextPoint.Y,this.X-nextPoint.X);
 		aiming_rotation = ((float)Math.Atan2(difference.X, difference.Y)*180f)/3.14f+180;
 
+		if(currentPath != null && currentPath.Count > 0 && Math.Abs(this.X - nextPoint.X) < 40 && Math.Abs(this.Y-nextPoint.Y)<40){
+			currentPath.RemoveAt(0);
+		}
+	}
+
+	public void FaceTarget(){
+		Entity? target = GetNearestPlayer();
+		if(target == null) return;
+		PointF difference = new PointF(this.Y-target.Y,this.X-target.X);
+		aiming_rotation = ((float)Math.Atan2(difference.X, difference.Y)*180f)/3.14f+180;
+		this.rotation = aiming_rotation;
+	}
+
+	public void ShootAction(){
+		if(_sprite != shoot) _sprite = shoot;
+		isActionInProgress = true;
+
+		aiming_error = (float)((Game.rand.NextDouble() * 2 - 1) * 150 * (1.0f - accuracy));
+		tAttack = 1;
+		
+		_sprite.Trigger();
+
+		Object? victim = HitscanCheck(this.center, 400);   
+		if(victim != null && victim is Entity ent) ent.IsHit(damage, aiming_rotation + aiming_error, this);
+
+		speed = 0;
+	}
+
+	public void Action(){
+		UpdateAI();
+		Entity? target = GetNearestPlayer();
+		if(target == null) return;
+
+		if(isActionInProgress) return;
+
 		if(this.rotation-aiming_rotation > 180){
 			this.rotation -= 180;
 			speed *= -1;
@@ -56,37 +108,15 @@ public class Enemy : Entity{
 			else return;
 		}
 		
-		if(isActionInProgress){
-			tAttack+=-0.052f;
-			if(tAttack <= 0) isActionInProgress = false;
-			else {
-				aiming_rotation += aiming_error;
-				return;
-			}
-		}
-		
 		float distance = Tools.GetDistanceSquared(target.r.Location, this.r.Location);
 		if(distance > 90000){
 			if(_sprite != walk) _sprite = walk;
 			speed = Math.Clamp(speed + 1, -3, 3);
-			if(currentPath != null && currentPath.Count > 0 && Math.Abs(this.X - nextPoint.X) < 40 && Math.Abs(this.Y-nextPoint.Y)<40){
-				currentPath.RemoveAt(0);
-			}
 		}else{
-			if(_sprite != shoot) _sprite = shoot;
-			isActionInProgress = true;
-
-			aiming_error = (float)((Game.rand.NextDouble() * 2 - 1) * 150 * (1.0f - accuracy));
-			aiming_rotation += aiming_error;
-
-			tAttack = 1;
-			
-			_sprite.Trigger();
-
-			Object? victim = HitscanCheck(this.center, 400);   
-			if(victim != null && victim is Entity ent) ent.IsHit(damage, aiming_rotation);
-
-			speed = 0;
+			if(shootCooldown <= 0){
+				ShootAction();
+				shootCooldown = 1f; // Seconds between shots
+			}
 		}
 	}
 
@@ -122,11 +152,6 @@ public class Enemy : Entity{
 		return stand;
 	}
 	
-	public void ActionFormation(){
-		// TO-DO
-		// Maybe later
-	}
-
 	DateTime? dtDead;
 	public override void Update(){
 		if(isDead){
@@ -155,16 +180,34 @@ public class Enemy : Entity{
 			return;
 		}
 
+		if(isActionInProgress){
+			tAttack+=-0.052f;
+			if(tAttack <= 0) isActionInProgress = false;
+			else aiming_rotation += aiming_error;
+		}
+
+		if(shootCooldown > 0) shootCooldown -= 0.018f; // Roughly matches 18ms timer interval
+
+		if(Game.isTurnBased){
+			// Only update AI/Rotation if we are currently moving or it's our turn
+			// (TurnManager handles the AP-based triggers)
+			if(speed > 0.2f || Game.turnManager.IsActiveEnemy(this)){
+				UpdateAI();
+				float diff = Tools.GetAngleDifference(this.rotation, aiming_rotation);
+				this.rotation += diff * 0.15f; 
+			}
+		}else{
+			Action();
+			this.rotation = aiming_rotation;
+		}
+
 		_sprite = UpdateSprite();
-
- 		Action();
-
-		this.rotation = aiming_rotation;
 	}
 	
 	protected void Init(){
 		this.env = Game.env;
-		this.local_player = env.p;
+
+		this._friction_turnbased = 0.82f; // Slightly less friction for smoother gliding
 
 		r.Size = new Size(64, 64);
 		setHealth(100);
