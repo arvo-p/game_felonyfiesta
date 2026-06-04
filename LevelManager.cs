@@ -1,22 +1,21 @@
 public class LevelManager{
 	Environment env;
-	List<Enemy> managedEnemies = new List<Enemy>();
+	internal List<Enemy> managedEnemies = new List<Enemy>();
 	
-	int waveMaxEnemies = 20;
-	int waveRemaining = 6; //quantity of enemies to generate before the level finishes
-	int waveSimultaneousMax = 3; //maximum quantity of enemies at the same time
+	internal int waveMaxEnemies = 30;
+	internal int waveRemaining = 30; //quantity of enemies to generate before the level finishes
+	internal int waveSimultaneousMax = 5; //maximum quantity of enemies at the same time
 	
-	bool isLevelFinished = false;
+	internal bool isLevelFinished = false;
 	DateTime? dtRest;
 
 	public LevelManager(){
 		env = Game.env;
-		NextDialogue();
 	}
 	
 	public bool isDialoguePlaying = false;
 	public Dialogue dia;
-	int dialogue_pointer = 0;
+	internal int dialogue_pointer = 0;
     private void NextDialogue(){
 		int len = DialogueFootprints.Dialogues.Count;
 		if(dialogue_pointer > len - 1) return; // no more dialogues
@@ -32,7 +31,12 @@ public class LevelManager{
 		isLevelFinished = false;
 	}
 
+    bool isGameStarting = true;
 	public void Update(){
+		if(isGameStarting){
+			NextDialogue();
+			isGameStarting = false;
+		}
  		if(isDialoguePlaying && dia.isPlaying == false) isDialoguePlaying = false;
 		if(isLevelFinished == true){
 			if(!dtRest.HasValue) dtRest = DateTime.Now;

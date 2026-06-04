@@ -79,7 +79,7 @@ public class Object{
 		_center = new PointF(r.X+r.Width/2,r.Y+r.Height/2);
 	}
 
-	protected void SetCollisionCircles(){
+	public void SetCollisionCircles(){
 		float radius = r.Height>r.Width?r.Width/2:r.Height/2;
 		float totalLength = r.Height>r.Width?r.Height:r.Width;
 		float remainingLength = totalLength;

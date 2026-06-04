@@ -21,6 +21,8 @@ public class WeaponFootprints{
 			   ammoType=ItemDrop.Type.Smallbullets,
 			   icon=new Sprite(Resources.UI.ASE_PISTOOLI1),
 			   type=Weapon.Type.Gun,
+			   reloadSoundPath = Resources.Sounds.Guns._reload_gun,
+			   fireSoundPath = Resources.Sounds.Guns._shot_pistol,
 			},
 
 			new Weapon(40){
@@ -31,6 +33,8 @@ public class WeaponFootprints{
 			   ammoType=ItemDrop.Type.Bullets,
 			   icon=new Sprite(Resources.UI.ASE_KONSU1),
 			   type=Weapon.Type.Gun,
+			   reloadSoundPath = Resources.Sounds.Guns._reload_assaultriffle,
+			   fireSoundPath = Resources.Sounds.Guns._shot_assaultriffle,
 			},
 
 			new Weapon(40){
@@ -41,6 +45,8 @@ public class WeaponFootprints{
 			   ammoType=ItemDrop.Type.Bullets,
 			   icon=new Sprite(Resources.UI.ASE_SHOTGUN),
 			   type=Weapon.Type.Gun,
+			   reloadSoundPath = Resources.Sounds.Guns._reload_shotgun,
+			   fireSoundPath = Resources.Sounds.Guns._shot_shotgun,
 			},
 
 			new Weapon(40){
@@ -51,6 +57,8 @@ public class WeaponFootprints{
 			   ammoType=ItemDrop.Type.Rockets,
 			   icon=new Sprite(Resources.UI.ASE_SINKO1),
 			   type=Weapon.Type.Gun,
+			   reloadSoundPath = Resources.Sounds.Guns._reload_assaultriffle,
+			   fireSoundPath = Resources.Sounds.Guns._shot_assaultriffle,
 			},
 
 			new Weapon(40){
@@ -61,6 +69,8 @@ public class WeaponFootprints{
 			   ammoType=ItemDrop.Type.Bullets,
 			   icon=new Sprite(Resources.UI.ASE_SALAMA1),
 			   type=Weapon.Type.Gun,
+			   reloadSoundPath = Resources.Sounds.Guns._reload_assaultriffle,
+			   fireSoundPath = Resources.Sounds.Guns._shot_assaultriffle,
 			},
 
 			new Weapon(40){
@@ -71,6 +81,8 @@ public class WeaponFootprints{
 			   ammoType=ItemDrop.Type.Bullets,
 			   icon=new Sprite(Resources.UI.ASE_BYPASSER1),
 			   type=Weapon.Type.Gun,
+			   reloadSoundPath = Resources.Sounds.Guns._reload_assaultriffle,
+			   fireSoundPath = Resources.Sounds.Guns._shot_bypasser,
 			}
 		);
 	}

@@ -37,9 +37,7 @@ public class Player : Entity{
 		mass = 90;
 		SetCollisionCircles();
 
-		weapons.Add((Weapon)env.weaponFootprints.list[3].Clone(this));
-		weapons.Add((Weapon)env.weaponFootprints.list[4].Clone(this));
-		weapons.Add((Weapon)env.weaponFootprints.list[2].Clone(this));
+		weapons.Add((Weapon)env.weaponFootprints.list[(int)Weapon.WeaponType.Pistol].Clone(this));
 		
 		countWeapon = (short)weapons.Count; 
 		idxSelectedWeapon = 3;
@@ -207,5 +205,20 @@ public class Player : Entity{
 	public void TakeItem(ItemDrop item){
 		item.TakeMe(this);
 		env.All.Remove(item); 
+	}
+
+	public void AddWeapon(Weapon.WeaponType type){
+		int index = (int)type;
+		if (index < 0 || index >= env.weaponFootprints.list.Count) return;
+		
+		string[]? targetIcon = env.weaponFootprints.list[index].icon.frames_src;
+		if (targetIcon != null && weapons.Any(w => w.icon.frames_src != null && w.icon.frames_src.SequenceEqual(targetIcon))) {
+			// Already has it. Maybe give some ammo instead? 
+			// For now, let's just return.
+			return;
+		}
+		
+		weapons.Add((Weapon)env.weaponFootprints.list[index].Clone(this));
+		countWeapon = (short)weapons.Count;
 	}
 }

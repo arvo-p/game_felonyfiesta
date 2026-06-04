@@ -2,6 +2,17 @@ using System.Threading;
 using System.Threading.Tasks;
 
 public class Weapon{
+	public enum WeaponType
+	{
+		Axe = 0,
+		Pistol = 1,
+		AssaultRifle = 2,
+		Shotgun = 3,
+		RocketLauncher = 4,
+		LightningGun = 5,
+		Bypasser = 6
+	}
+
 	public required float damage{ get; set; }
 	public required Size dimensions{ get; set; }
 	public required Sprite sprite{ get; set; }
@@ -19,13 +30,14 @@ public class Weapon{
 	
 	public required Sprite icon;
 	public required ItemDrop.Type ammoType;
+	public string? reloadSoundPath;
+	NativeAudioPlayer? reloadPlayer;
+
+	public string? fireSoundPath;
+	NativeAudioPlayer? firePlayer;
 
 	public int currentClip;
 	public int maxClip{ get; set; }
-
-	public Image image{
-		get => sprite.frame;
-	}
 	
 	public Weapon(int maxClip){
 		this.maxClip = maxClip;
@@ -39,6 +51,11 @@ public class Weapon{
 		
 		ref int reserve = ref GetReserve(ammoType, owner.inventory);
 		if(reserve <= 0) return;
+
+		if(reloadSoundPath != null){
+			if(reloadPlayer == null) reloadPlayer = new NativeAudioPlayer(Resources.root + "/" + reloadSoundPath);
+			reloadPlayer.Play();
+		}
 		
 		if(reserve > maxClip){
 			currentClip = maxClip;
@@ -77,6 +94,12 @@ public class Weapon{
 			isShooting = true;
 			sprite.Trigger();
 			currentClip--;
+
+			if(fireSoundPath != null){
+				if(firePlayer == null) firePlayer = new NativeAudioPlayer(Resources.root + "/" + fireSoundPath);
+				firePlayer.Play();
+			}
+
 			return true;
 		}
 		return false;

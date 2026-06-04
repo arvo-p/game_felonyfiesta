@@ -24,7 +24,7 @@ public class ObjectsManager : IEnumerable<Object>
         if (index < Objects.Count) return Objects[index];
 		int itemIndex = index - Objects.Count;
 
-        if (itemIndex < Entities.Count) return Objects[itemIndex];
+        if (itemIndex < Items.Count) return Items[itemIndex];
 		int entityIndex = itemIndex - Items.Count;
 
         return Entities[entityIndex];

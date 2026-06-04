@@ -165,6 +165,11 @@ public class Resources{
 		public static string[] ASE_SHOTGUN = {
 			"UI/Weaponicon_shotgun.png"
 	 	};
+
+		public static class Parallax {
+			public static string Background = "Parallax/background.png";
+			public static string Foreground = "Parallax/foreground.png";
+		}
 	}
 
 	public static class Item{
@@ -173,6 +178,15 @@ public class Resources{
 		public static string _rocket = "Items/Item_rocket.png";
 		public static string _shells = "Items/Item_shells.png";
 		public static string _smallbullets= "Items/Item_smallbullets.png";
+		public static string _battery = "Items/Item_battery.png";
+		public static string _biofoton = "Items/Item_Biofoton.png";
+		public static string _bypasser = "Items/Item_Bypasser.png";
+		public static string _assaultgun = "Items/Weapon_assaultgun.png";
+		public static string _rocketrifle = "Items/Weapon_rocketrifle.png";
+		public static string _shockfist = "Items/Weapon_shockfist.png";
+		public static string _shotgun = "Items/Weapon_shotgun.png";
+		public static string _pistol = "Items/Weapon_pistol.png";
+		public static string _grenade = "Items/Grenade.png";
 	}
 	
 	public static class Sounds{
@@ -180,6 +194,15 @@ public class Resources{
          	"Sounds/thugdeath1.wav",
 			"Sounds/thugdeath2.wav"
 		};
+		public static class Guns{
+			public static string _reload_assaultriffle = "Sounds/guns/reload_assaultriffle.wav";
+			public static string _reload_gun = "Sounds/guns/reload_gun.wav";
+			public static string _reload_shotgun = "Sounds/guns/reload_shotgun.wav";
+			public static string _shot_assaultriffle = "Sounds/guns/shot_assaultriffle.wav";
+			public static string _shot_bypasser = "Sounds/guns/shot_bypasser.wav";
+			public static string _shot_pistol = "Sounds/guns/shot_pistol.wav";
+			public static string _shot_shotgun = "Sounds/guns/shot_shotgun.wav";
+		}
 	}
 
 	public static class Thug{

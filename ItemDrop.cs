@@ -10,6 +10,7 @@ public class ItemDrop : Object{
 		Rockets,
 		Shells,
 		Smallbullets,
+		Weapon,
 	}	
 
 	public int quantity = 0;
@@ -17,6 +18,15 @@ public class ItemDrop : Object{
 
 	public ItemDrop(string srcSprite, Func<Player, int, Type, bool> f, Type type, int quantity){
 		_sprite = new Sprite(srcSprite);
+		this.Effect = f;
+		r.Width = 48;
+		r.Height = 48;
+		this.type = type;
+		this.quantity = quantity;
+	}
+
+	public ItemDrop(string[] srcSprites, Func<Player, int, Type, bool> f, Type type, int quantity){
+		_sprite = new Sprite(srcSprites);
 		this.Effect = f;
 		r.Width = 48;
 		r.Height = 48;

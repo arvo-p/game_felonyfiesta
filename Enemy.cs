@@ -17,7 +17,7 @@ public class Enemy : Entity{
 	protected float aiming_rotation;
 	protected float aiming_error = 0;
 
-	public float accuracy = 0.8f;
+	public float accuracy = 0.6f;
 	public float tAttack = 1;
 	public float tStun = 1;
 	
@@ -27,7 +27,7 @@ public class Enemy : Entity{
 	protected List<PointF>? currentPath = null;
 	DateTime dtRefreshPath=DateTime.Now;
 
-	private int damage = 10;
+	private int damage = 5;
 	
 	public void Action(){
 		Entity target = local_player.inside==null?local_player:local_player.inside;
@@ -76,7 +76,7 @@ public class Enemy : Entity{
 			if(_sprite != shoot) _sprite = shoot;
 			isActionInProgress = true;
 
-			aiming_error = (float)((Game.rand.NextDouble() * 2 - 1) * 30 * (1.0f - accuracy));
+			aiming_error = (float)((Game.rand.NextDouble() * 2 - 1) * 150 * (1.0f - accuracy));
 			aiming_rotation += aiming_error;
 
 			tAttack = 1;
@@ -92,8 +92,12 @@ public class Enemy : Entity{
 
 	public override void DropItem(){
 		var rand = new Random();
-		if(rand.Next(0, 6)==0)
+		double roll = rand.NextDouble();
+		if(roll < 0.4) { 
 			env.All.Add(new ItemDrop(this.X, this.Y, ItemDropFootprints.SelectRandom()));
+		} else if(roll < 0.6) { 
+			env.All.Add(new ItemDrop(this.X, this.Y, ItemDropFootprints.SelectRandomGun()));
+		}
 	}
 
 	public override void IsHit(float damage, float rotation){
@@ -123,15 +127,20 @@ public class Enemy : Entity{
 		// Maybe later
 	}
 
+	DateTime? dtDead;
 	public override void Update(){
 		if(isDead){
-			if(doUpdateSprite){
+			if(doUpdateSprite||dtDead==null){
 				doUpdateSprite = false;
 				_sprite = UpdateSprite();
 				_sprite.Trigger();
 				
+                dtDead = DateTime.Now;
+				
 				if(soundsDeath != null)
 			   	    soundsDeath[Game.rand.Next(0,soundsDeath.Count)].Play(); 
+			}else if((DateTime.Now - dtDead.Value).TotalSeconds >= 10){
+             	env.All.Remove(this);
 			}
 			return;
 		}

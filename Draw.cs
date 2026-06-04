@@ -248,7 +248,7 @@ public class Draw{
 			weaponMovementVect.X += add.X;
 			weaponMovementVect.Y += add.Y;
 		}
-		DrawRotated(e, weapon.image, new RectangleF(weaponMovementVect.X, weaponMovementVect.Y, player.Width, player.Height), player.rotation);
+		DrawRotated(e, weapon.sprite.frame, new RectangleF(weaponMovementVect.X, weaponMovementVect.Y, player.Width, player.Height), player.rotation);
 	}
 	
 	private void DrawCrosshair(PaintEventArgs e, Crosshair c){
@@ -299,6 +299,63 @@ public class Draw{
 		this.end = end;
 	}
 
+	private void PrintMinimap(PaintEventArgs e) {
+		if (Game.camera.follow == null) return;
+		Graphics g = e.Graphics;
+
+		int size = 200;
+		int padding = 20;
+		RectangleF miniRect = new RectangleF(padding, padding, size, size);
+
+		// Background and Border
+		g.FillRectangle(new SolidBrush(Color.FromArgb(180, 0, 0, 0)), miniRect);
+		
+		var state = g.Save();
+		g.SetClip(miniRect);
+
+		float scale = 0.15f; // Zoom level
+		PointF playerPos = Game.camera.follow.center;
+
+		// Transform to minimap space
+		g.TranslateTransform(padding + size / 2, padding + size / 2);
+		g.ScaleTransform(scale, scale);
+		g.TranslateTransform(-playerPos.X, -playerPos.Y);
+
+		// Draw Tiles
+		int td = env.map.tileRenderDimension;
+		int viewDist = (int)(size / scale / 2) + td;
+		int startX = (int)((playerPos.X - viewDist) / td);
+		int endX = (int)((playerPos.X + viewDist) / td);
+		int startY = (int)((playerPos.Y - viewDist) / td);
+		int endY = (int)((playerPos.Y + viewDist) / td);
+
+		for (int i = startX; i <= endX; i++) {
+			if (i < 0 || i >= env.map.map.GetLength(0)) continue;
+			for (int j = startY; j <= endY; j++) {
+				if (j < 0 || j >= env.map.map.GetLength(1)) continue;
+				int t1 = env.map.map[i, j];
+				if (t1 != -1) g.DrawImage(env.map.tileMap[t1], i * td, j * td, td + 1, td + 1);
+				int t2 = env.map.secondLayer[i, j];
+				if (t2 != -1) g.DrawImage(env.map.tileMap[t2], i * td, j * td, td + 1, td + 1);
+			}
+		}
+
+		// Draw Buildings
+		foreach (var b in env.map.buildings) {
+			g.FillRectangle(Brushes.Gray, b.X, b.Y, b.Width, b.Height);
+		}
+
+		// Draw Entities
+		foreach (var npc in env.All.Entities.NPCs) if (!npc.isDead) g.FillEllipse(Brushes.Red, npc.r.X, npc.r.Y, 64, 64);
+		foreach (var v in env.All.Entities.Vehicles) g.FillRectangle(Brushes.Blue, v.r.X, v.r.Y, 120, 120);
+
+		// Player indicator
+		g.FillEllipse(Brushes.White, playerPos.X - 32, playerPos.Y - 32, 64, 64);
+
+		g.Restore(state);
+		g.DrawRectangle(new Pen(Color.Cyan, 2), padding, padding, size, size);
+	}
+
 	public void Update(PaintEventArgs e){
 		e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
         e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
@@ -330,6 +387,7 @@ public class Draw{
 		// UI
 		
 		PrintAmmo(e);
+		PrintMinimap(e);
 		if(env.isDialoguePlaying){
          	e.Graphics.DrawImage(env.dialogue.nowhead.frame, 30, Game.windowHeight-230, 200, 200);
 		}

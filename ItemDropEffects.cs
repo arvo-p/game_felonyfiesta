@@ -4,4 +4,9 @@ public static class ItemDropEffects{
 		player.inventory.AddAmmo(quantity, type);
 		return true;
 	}
+
+	public static bool Weapon(Player player, int quantity, ItemDrop.Type type){
+		player.AddWeapon((Weapon.WeaponType)quantity);
+		return true;
+	}
 }

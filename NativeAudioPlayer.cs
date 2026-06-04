@@ -64,36 +64,30 @@ public class NativeAudioPlayer : IDisposable
 
     public bool IsDone { get; private set; } = true;
 
-    public NativeAudioPlayer(string filePath)
-    {
+    public NativeAudioPlayer(string filePath) {
         _filePath = Path.GetFullPath(filePath);
     }
 
-    public void Load()
-    {
-        if (_unmanagedAudioBuffer != IntPtr.Zero) return;
+    public void Load() {
+        if(_unmanagedAudioBuffer != IntPtr.Zero) return;
 
-        if (!File.Exists(_filePath))
-        {
+        if(!File.Exists(_filePath)){
             throw new FileNotFoundException($"Audio file not found: {_filePath}");
         }
 
         byte[] fileBytes = File.ReadAllBytes(_filePath);
 
         using (var ms = new MemoryStream(fileBytes))
-        using (var br = new BinaryReader(ms))
-        {
+        using (var br = new BinaryReader(ms)) {
             br.ReadChars(4); // RIFF
             br.ReadUInt32(); // File size
             br.ReadChars(4); // WAVE
 
-            while (ms.Position < ms.Length)
-            {
+            while (ms.Position < ms.Length) {
                 string chunkId = new string(br.ReadChars(4));
                 uint chunkSize = br.ReadUInt32();
 
-                if (chunkId == "fmt ")
-                {
+                if (chunkId == "fmt ") {
                     _format = new WaveFormat
                     {
                         wFormatTag = br.ReadUInt16(),
@@ -106,23 +100,20 @@ public class NativeAudioPlayer : IDisposable
                     };
                     if (chunkSize > 16) ms.Position += (chunkSize - 16);
                 }
-                else if (chunkId == "data")
-                {
+                else if (chunkId == "data") {
                     _bufferLength = chunkSize;
                     _unmanagedAudioBuffer = Marshal.AllocHGlobal((int)chunkSize);
                     byte[] pcmData = br.ReadBytes((int)chunkSize);
                     Marshal.Copy(pcmData, 0, _unmanagedAudioBuffer, pcmData.Length);
                     break;
                 }
-                else
-                {
+                else {
                     ms.Position += chunkSize;
                 }
             }
         }
 
-        _workerThread = new Thread(AudioLoop)
-        {
+        _workerThread = new Thread(AudioLoop) {
             IsBackground = true,
             Name = "AudioLoop_" + Path.GetFileName(_filePath),
             Priority = ThreadPriority.AboveNormal
@@ -134,10 +125,8 @@ public class NativeAudioPlayer : IDisposable
      	await PlayAsync();
 	}
 
-    public Task PlayAsync()
-    {
-        if (_unmanagedAudioBuffer == IntPtr.Zero)
-        {
+    public Task PlayAsync() {
+        if (_unmanagedAudioBuffer == IntPtr.Zero) {
             Load();
         }
 
@@ -148,17 +137,14 @@ public class NativeAudioPlayer : IDisposable
         return _tcs.Task;
     }
 
-    private void AudioLoop()
-    {
-        while (_running)
-        {
+    private void AudioLoop() {
+        while (_running) {
             _playSignal.WaitOne(); 
             if (!_running) break;
 
             IntPtr hWaveOut = IntPtr.Zero;
 
-            if (waveOutOpen(out hWaveOut, WAVE_MAPPER, ref _format, IntPtr.Zero, IntPtr.Zero, 0) == 0)
-            {
+            if (waveOutOpen(out hWaveOut, WAVE_MAPPER, ref _format, IntPtr.Zero, IntPtr.Zero, 0) == 0) {
                 WaveHeader header = new WaveHeader
                 {
                     lpData = _unmanagedAudioBuffer,
@@ -170,8 +156,7 @@ public class NativeAudioPlayer : IDisposable
                 waveOutPrepareHeader(hWaveOut, ref header, (uint)Marshal.SizeOf(header));
                 waveOutWrite(hWaveOut, ref header, (uint)Marshal.SizeOf(header));
 
-                while ((header.dwFlags & WHDR_DONE) == 0 && _running)
-                {
+                while ((header.dwFlags & WHDR_DONE) == 0 && _running) {
                     Thread.Sleep(5);
                 }
 
@@ -185,12 +170,10 @@ public class NativeAudioPlayer : IDisposable
         }
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
         _running = false;
         _playSignal.Set();
-        if (_unmanagedAudioBuffer != IntPtr.Zero)
-        {
+        if (_unmanagedAudioBuffer != IntPtr.Zero) {
             Marshal.FreeHGlobal(_unmanagedAudioBuffer);
             _unmanagedAudioBuffer = IntPtr.Zero;
         }

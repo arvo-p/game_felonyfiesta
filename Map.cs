@@ -5,6 +5,7 @@ public class Map{
 	
 	public Image[,] gmap;
 	public int[,] map;
+	public int[,] secondLayer;
 	public int[,] collision;
 
 	public Size worldsize;
@@ -21,7 +22,6 @@ public class Map{
 	}
 
 	public Map(string[] filepathMap, string filepathTileset){
-		int[,] secondLayer;
 		int[,] buildingsLayer;
 
 		if(File.Exists(filepathMap[0]) == false) throw new Exception("Map file inexistant");

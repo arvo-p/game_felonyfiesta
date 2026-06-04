@@ -1,5 +1,6 @@
 public class Sprite{
 	List<Image> frames = new List<Image>();
+	public string[]? frames_src;
 	int index=0;
 	int length=0;
 	int slothFactor=1;
@@ -32,6 +33,7 @@ public class Sprite{
 	}
 
 	public Sprite(string[] filepaths){
+		this.frames_src = filepaths;
 		foreach(string pre_filepath in filepaths){
 			string filepath = Resources.root + "/" + pre_filepath;
 			Image i = Image.FromStream(new MemoryStream(File.ReadAllBytes(filepath)));
@@ -44,6 +46,7 @@ public class Sprite{
 	}
 
 	public Sprite(string pre_filepath){
+		this.frames_src = new string[]{pre_filepath};
 		string filepath = Resources.root + "/" + pre_filepath;
 		Image i = Image.FromStream(new MemoryStream(File.ReadAllBytes(filepath)));
 		frames.Add(i);
@@ -51,6 +54,7 @@ public class Sprite{
 	}
 
 	public Sprite(string[] filepaths, int restingframe_idx, int slothFactor){
+		this.frames_src = filepaths;
 		this._isInfiniteLoop = false;
 		this.restingframe_idx = restingframe_idx;
 
@@ -77,6 +81,7 @@ public class Sprite{
 	}
 
 	public Sprite(string[] filepaths, int restingframe_idx, int slothFactor, bool infinite){
+		this.frames_src = filepaths;
 		this._isInfiniteLoop = infinite;
 		this.restingframe_idx = restingframe_idx;
 		this.slothFactor = slothFactor;
