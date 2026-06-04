@@ -32,9 +32,9 @@ public class Autoaim{
 			return SelectNext(dir);
 		}
 
-		float dist = Tools.GetDistanceSquared(parent.r.Location, new PointF(target.r.X+target.r.Width/2, target.r.Y+target.r.Height/2));
+		float dist = Tools.GetDistanceSquared(parent.center, target.center);
 
-		PointF difference = new PointF(parent.r.Y-target.r.Y,parent.r.X-target.r.X);
+		PointF difference = new PointF(parent.center.Y-target.center.Y,parent.center.X-target.center.X);
 		float new_aiming_rotation = ((float)Math.Atan2(difference.X, difference.Y)*180f)/3.14f+180;
 
 		rotation = new_aiming_rotation;
@@ -46,7 +46,7 @@ public class Autoaim{
 	}
 
 	private float AngleDifference(Entity me, Entity other){
-		PointF difference = new PointF(me.r.Y-other.r.Y,me.r.X-other.r.X);
+		PointF difference = new PointF(me.center.Y-other.center.Y,me.center.X-other.center.X);
 		float aimingRotation = ((float)Math.Atan2(difference.X, difference.Y)*180f)/3.14f+180f;
 		return Tools.GetAngleDifference(me.rotation, aimingRotation);
 	}
@@ -58,7 +58,7 @@ public class Autoaim{
 		int size = 0;
 		foreach(var ent in env.All.Entities.NPCs){
 			if(ent.isDead == true) continue;
-			float dist = Tools.GetDistanceSquared(parent.r.Location, new PointF(ent.r.X, ent.r.Y));
+			float dist = Tools.GetDistanceSquared(parent.center, ent.center);
 			if(dist > 360000) continue; 
 			sortedTargets.Add(ent);
 			size++;
@@ -76,8 +76,8 @@ public class Autoaim{
 		// order by angle first and then distance
 		sortedTargets.Sort((a, b) =>
 		{
-			float dist1 = Tools.GetDistanceSquared(parent.r.Location, a.r.Location);
-			float dist2 = Tools.GetDistanceSquared(parent.r.Location, b.r.Location);
+			float dist1 = Tools.GetDistanceSquared(parent.center, a.center);
+			float dist2 = Tools.GetDistanceSquared(parent.center, b.center);
 			return dist1.CompareTo(dist2);
 		});
 

@@ -55,9 +55,10 @@ public class Entity : Object{
 	public virtual void DropItem(){
 	}
 
-	public Object? HitscanCheck(PointF start, float range){
+	public Object? HitscanCheck(PointF start, float range, float? angleOverride = null){
 		float angle;
-		angle = this.rotation*0.0174533f;
+		if(angleOverride != null) angle = angleOverride.Value * 0.0174533f;
+		else angle = this.rotation*0.0174533f;
 
 		PointF targetPoint = start;
 		for (float d = 0; d < range; d += 16){
@@ -77,7 +78,7 @@ public class Entity : Object{
 			if(obj == this) continue;
 			if(obj is Entity ent) if(ent.isDead) continue;
 			if(Tools.IsLineIntersectingRect(start, targetPoint, obj.r)){
-				float dist = Tools.GetDistance(start, new PointF(obj.r.X, obj.r.Y));
+				float dist = Tools.GetDistance(start, obj.center);
 				if(dist < closestDistance){
 					closestDistance = dist; 
 					closestHit = obj;

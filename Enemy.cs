@@ -54,12 +54,12 @@ public class Enemy : Entity{
 			currentPath = pathf.FindPath((int)this.X, (int)this.Y, (int)target.X, (int)target.Y); 
 		}
 
-		PointF nextPoint = new PointF(target.X,target.Y); 
+		PointF nextPoint = target.center; 
 		if(currentPath != null && currentPath.Count > 0){
 			nextPoint = currentPath[0];
 		}
 		
-		PointF difference = new PointF(this.Y-nextPoint.Y,this.X-nextPoint.X);
+		PointF difference = new PointF(this.center.Y-nextPoint.Y,this.center.X-nextPoint.X);
 		aiming_rotation = ((float)Math.Atan2(difference.X, difference.Y)*180f)/3.14f+180;
 
 		if(currentPath != null && currentPath.Count > 0 && Math.Abs(this.X - nextPoint.X) < 40 && Math.Abs(this.Y-nextPoint.Y)<40){
@@ -70,7 +70,7 @@ public class Enemy : Entity{
 	public void FaceTarget(){
 		Entity? target = GetNearestPlayer();
 		if(target == null) return;
-		PointF difference = new PointF(this.Y-target.Y,this.X-target.X);
+		PointF difference = new PointF(this.center.Y-target.center.Y,this.center.X-target.center.X);
 		aiming_rotation = ((float)Math.Atan2(difference.X, difference.Y)*180f)/3.14f+180;
 		this.rotation = aiming_rotation;
 	}
@@ -84,8 +84,9 @@ public class Enemy : Entity{
 		
 		_sprite.Trigger();
 
-		Object? victim = HitscanCheck(this.center, 400);   
-		if(victim != null && victim is Entity ent) ent.IsHit(damage, aiming_rotation + aiming_error, this);
+		float shotAngle = aiming_rotation + aiming_error;
+		Object? victim = HitscanCheck(this.center, 400, shotAngle);   
+		if(victim != null && victim is Entity ent) ent.IsHit(damage, shotAngle, this);
 
 		speed = 0;
 	}
