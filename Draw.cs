@@ -356,6 +356,30 @@ public class Draw{
 		g.DrawRectangle(new Pen(Color.Cyan, 2), padding, padding, size, size);
 	}
 
+	private void PrintHealth(PaintEventArgs e) {
+		if (Game.camera.follow is not Player p) return;
+		Graphics g = e.Graphics;
+
+		int width = 200;
+		int height = 25;
+		int padding = 20;
+		RectangleF healthRect = new RectangleF(padding, padding + 200 + 10, width, height);
+
+		g.FillRectangle(new SolidBrush(Color.FromArgb(180, 0, 0, 0)), healthRect);
+
+		float healthPercent = (float)p.health / p.maxhealth;
+		if (healthPercent < 0) healthPercent = 0;
+		g.FillRectangle(Brushes.Crimson, healthRect.X, healthRect.Y, width * healthPercent, height);
+
+		g.DrawRectangle(new Pen(Color.Cyan, 2), healthRect.X, healthRect.Y, width, height);
+
+		using (Font font = new Font(Resources.Font._pfc.Families[0], 10, FontStyle.Bold))
+		using (Brush brush = new SolidBrush(Color.White)) {
+			string healthText = $"{p.health} / {p.maxhealth}";
+			g.DrawString(healthText, font, brush, healthRect.X + 5, healthRect.Y + 2);
+		}
+	}
+
 	public void Update(PaintEventArgs e){
 		e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
         e.Graphics.PixelOffsetMode = PixelOffsetMode.Half;
@@ -388,6 +412,7 @@ public class Draw{
 		
 		PrintAmmo(e);
 		PrintMinimap(e);
+		PrintHealth(e);
 		if (Game.isTurnBased) Game.turnManager.Draw(e.Graphics);
 		if(env.isDialoguePlaying){
          	e.Graphics.DrawImage(env.dialogue.nowhead.frame, 30, Game.windowHeight-230, 200, 200);

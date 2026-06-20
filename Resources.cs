@@ -194,6 +194,7 @@ public class Resources{
          	"Sounds/thugdeath1.wav",
 			"Sounds/thugdeath2.wav"
 		};
+		public static string _main_theme = "Sounds/theme_music.wav";
 		public static class Guns{
 			public static string _reload_assaultriffle = "Sounds/guns/reload_assaultriffle.wav";
 			public static string _reload_gun = "Sounds/guns/reload_gun.wav";

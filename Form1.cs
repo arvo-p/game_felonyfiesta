@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Media;
 using System.Drawing.Drawing2D;
 
 namespace game;
@@ -15,7 +16,8 @@ public partial class Form1 : Form{
 	private Image? imgParallaxFore;
 	private Color themeColor = Color.FromArgb(180, 80, 255); // Electric Violet
 	private float animationTimer = 0;
-
+    
+	public SoundPlayer maintheme = new SoundPlayer(@"Resources/"+Resources.Sounds._main_theme);
     public Form1(){
 		Resources.Font.Load();
 		InitializeUI();
@@ -23,6 +25,7 @@ public partial class Form1 : Form{
 		CreateMenuUI();
 		Debug();
 		Game.Init(this, windowWidth, windowHeight);
+		maintheme.Play();
 	}
 
 	private void LoadParallaxImages(){
@@ -167,6 +170,7 @@ public partial class Form1 : Form{
 
         		Game.turnManager.Reset();
 				Game.activeState = Game.State.Playing;
+				maintheme.Stop();
 				Game.New(count);
 			};
 
@@ -282,12 +286,14 @@ public partial class Form1 : Form{
 				ctrl.BringToFront();
 			}
 		}else{
+			maintheme.Stop();
 			Game.New(1);
 			Game.activeState = Game.State.Playing;
 		}
 	}
 
 	private void LoadGame(){
+		maintheme.Stop();
 		Game.New();
 		SaveSystem.Load("savegame.json");
 		foreach(var ctrl in menuControls){

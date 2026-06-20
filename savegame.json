@@ -2,17 +2,17 @@
   "IsTurnBased": true,
   "Level": {
     "WaveMaxEnemies": 30,
-    "WaveRemaining": 25,
+    "WaveRemaining": 24,
     "WaveSimultaneousMax": 5,
     "IsLevelFinished": false,
     "DialoguePointer": 1
   },
   "Players": [
     {
-      "X": 1270,
-      "Y": 113,
-      "Rotation": 100,
-      "Speed": 0,
+      "X": 909.2391,
+      "Y": 392.10803,
+      "Rotation": 20,
+      "Speed": 2.9324001E-08,
       "Health": 100,
       "SelectedWeaponIndex": 0,
       "Inventory": {
@@ -25,11 +25,11 @@
       }
     },
     {
-      "X": 1022,
-      "Y": 133,
-      "Rotation": 0,
-      "Speed": 0,
-      "Health": 100,
+      "X": 1187.112,
+      "Y": 336.37714,
+      "Rotation": 76.92833,
+      "Speed": 1.4480173E-24,
+      "Health": 95,
       "SelectedWeaponIndex": 0,
       "Inventory": {
         "Grenades": 10,
@@ -43,53 +43,53 @@
   ],
   "NPCs": [
     {
-      "Type": "Thug",
-      "X": 2247,
-      "Y": 851,
+      "Type": "Merc",
+      "X": 1137.8068,
+      "Y": 662.3226,
       "Width": 64,
       "Height": 64,
-      "Rotation": 0,
-      "Speed": 0,
+      "Rotation": 278.25385,
+      "Speed": -2.4732731E-19,
+      "Health": 65
+    },
+    {
+      "Type": "Merc",
+      "X": 753.5409,
+      "Y": 760.0087,
+      "Width": 64,
+      "Height": 64,
+      "Rotation": 251.80716,
+      "Speed": 3E-45,
       "Health": 100
+    },
+    {
+      "Type": "Thug",
+      "X": 1256.3091,
+      "Y": 642.3715,
+      "Width": 64,
+      "Height": 64,
+      "Rotation": 257.0196,
+      "Speed": -8.80284E-18,
+      "Health": 65
     },
     {
       "Type": "Doctor",
-      "X": 249,
-      "Y": 729,
+      "X": 720.25836,
+      "Y": 676.38544,
       "Width": 64,
       "Height": 64,
-      "Rotation": 0,
-      "Speed": 0,
+      "Rotation": 252.92096,
+      "Speed": 3E-45,
       "Health": 100
     },
     {
       "Type": "Thug",
-      "X": 2270,
-      "Y": 753,
+      "X": 1451.2435,
+      "Y": 895.80835,
       "Width": 64,
       "Height": 64,
-      "Rotation": 0,
-      "Speed": 0,
-      "Health": 100
-    },
-    {
-      "Type": "Thug",
-      "X": 286,
-      "Y": 629,
-      "Width": 64,
-      "Height": 64,
-      "Rotation": 0,
-      "Speed": 0,
-      "Health": 100
-    },
-    {
-      "Type": "Thug",
-      "X": 2355,
-      "Y": 950,
-      "Width": 64,
-      "Height": 64,
-      "Rotation": 0,
-      "Speed": 0,
+      "Rotation": 245.10747,
+      "Speed": 2.8E-44,
       "Health": 100
     }
   ],
@@ -104,5 +104,12 @@
       "Health": 100
     }
   ],
-  "Items": []
+  "Items": [
+    {
+      "Type": "Rockets",
+      "Quantity": 1,
+      "X": 1325.221,
+      "Y": 610.02905
+    }
+  ]
 }

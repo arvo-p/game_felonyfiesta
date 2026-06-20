@@ -1,4 +1,4 @@
- using System;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -50,7 +50,7 @@ public class NativeAudioPlayer : IDisposable
     }
 
     private const uint WAVE_MAPPER = 0xFFFFFFFF;
-    private const uint WHDR_DONE = 0x00000001;
+    private const uint CALLBACK_EVENT = 0x00050000;
 
     private readonly string _filePath;
     private IntPtr _unmanagedAudioBuffer = IntPtr.Zero;
@@ -59,6 +59,7 @@ public class NativeAudioPlayer : IDisposable
     
     private Thread _workerThread;
     private AutoResetEvent _playSignal = new AutoResetEvent(false);
+    private AutoResetEvent _hardwareSignal = new AutoResetEvent(false);
     private bool _running = true;
     private TaskCompletionSource<bool> _tcs;
 
@@ -79,9 +80,9 @@ public class NativeAudioPlayer : IDisposable
 
         using (var ms = new MemoryStream(fileBytes))
         using (var br = new BinaryReader(ms)) {
-            br.ReadChars(4); // RIFF
-            br.ReadUInt32(); // File size
-            br.ReadChars(4); // WAVE
+            br.ReadChars(4);
+            br.ReadUInt32();
+            br.ReadChars(4);
 
             while (ms.Position < ms.Length) {
                 string chunkId = new string(br.ReadChars(4));
@@ -121,9 +122,9 @@ public class NativeAudioPlayer : IDisposable
         _workerThread.Start();
     }
 
-	public async void Play(){
-     	await PlayAsync();
-	}
+    public async void Play(){
+         await PlayAsync();
+    }
 
     public Task PlayAsync() {
         if (_unmanagedAudioBuffer == IntPtr.Zero) {
@@ -131,7 +132,7 @@ public class NativeAudioPlayer : IDisposable
         }
 
         IsDone = false;
-        _tcs = new TaskCompletionSource<bool>();
+        _tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         _playSignal.Set(); 
 
         return _tcs.Task;
@@ -143,8 +144,9 @@ public class NativeAudioPlayer : IDisposable
             if (!_running) break;
 
             IntPtr hWaveOut = IntPtr.Zero;
+            IntPtr hEvent = _hardwareSignal.SafeWaitHandle.DangerousGetHandle();
 
-            if (waveOutOpen(out hWaveOut, WAVE_MAPPER, ref _format, IntPtr.Zero, IntPtr.Zero, 0) == 0) {
+            if (waveOutOpen(out hWaveOut, WAVE_MAPPER, ref _format, hEvent, IntPtr.Zero, CALLBACK_EVENT) == 0) {
                 WaveHeader header = new WaveHeader
                 {
                     lpData = _unmanagedAudioBuffer,
@@ -154,14 +156,19 @@ public class NativeAudioPlayer : IDisposable
                 };
 
                 waveOutPrepareHeader(hWaveOut, ref header, (uint)Marshal.SizeOf(header));
+                
+                _hardwareSignal.Reset();
                 waveOutWrite(hWaveOut, ref header, (uint)Marshal.SizeOf(header));
 
-                while ((header.dwFlags & WHDR_DONE) == 0 && _running) {
-                    Thread.Sleep(5);
+                while (_running) {
+                    _hardwareSignal.WaitOne(50);
+                    if ((header.dwFlags & 0x00000001) != 0 || !_running) {
+                        break;
+                    }
                 }
 
-                waveOutUnprepareHeader(hWaveOut, ref header, (uint)Marshal.SizeOf(header));
                 waveOutReset(hWaveOut);
+                waveOutUnprepareHeader(hWaveOut, ref header, (uint)Marshal.SizeOf(header));
                 waveOutClose(hWaveOut);
             }
 
@@ -173,10 +180,14 @@ public class NativeAudioPlayer : IDisposable
     public void Dispose() {
         _running = false;
         _playSignal.Set();
+        _hardwareSignal.Set();
+        
         if (_unmanagedAudioBuffer != IntPtr.Zero) {
             Marshal.FreeHGlobal(_unmanagedAudioBuffer);
             _unmanagedAudioBuffer = IntPtr.Zero;
         }
+        
         _playSignal.Dispose();
+        _hardwareSignal.Dispose();
     }
 }

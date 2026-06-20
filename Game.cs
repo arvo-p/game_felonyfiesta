@@ -38,6 +38,7 @@ public static class Game{
 	}
 
 	public static void New(int playerCount = 1){
+
 		camera = new Camera();
 		new Environment(playerCount);
 		draw = new Draw(env, windowWidth, windowHeight);
