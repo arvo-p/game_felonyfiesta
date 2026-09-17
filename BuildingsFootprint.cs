@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 public static class BuildingsFootprint{
 	public static List<Building> list = new List<Building>(); 
 	public static void Init(){
@@ -29,3 +31,4 @@ public static class BuildingsFootprint{
 		return ret;
 	}
 }
+

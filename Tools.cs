@@ -1,11 +1,13 @@
+using System.Numerics;
+using Raylib_cs;
 public static class Tools{
-	public static bool IsLineIntersectingRect(PointF p1, PointF p2, RectangleF r){
-		if (r.Contains(p1) || r.Contains(p2)) return true;
+	public static bool IsLineIntersectingRect(Vector2 p1, Vector2 p2, Rectangle r){
+		if (Raylib.CheckCollisionPointRec(p1, r) || Raylib.CheckCollisionPointRec(p2, r)) return true;
 
-		return LineIntersectsLine(p1, p2, new PointF(r.Left, r.Top), new PointF(r.Right, r.Top)) ||
-			   LineIntersectsLine(p1, p2, new PointF(r.Left, r.Bottom), new PointF(r.Right, r.Bottom)) ||
-			   LineIntersectsLine(p1, p2, new PointF(r.Left, r.Top), new PointF(r.Left, r.Bottom)) ||
-			   LineIntersectsLine(p1, p2, new PointF(r.Right, r.Top), new PointF(r.Right, r.Bottom));
+		return LineIntersectsLine(p1, p2, new Vector2(r.X, r.Y), new Vector2((r.X + r.Width), r.Y)) ||
+			   LineIntersectsLine(p1, p2, new Vector2(r.X, (r.Y + r.Height)), new Vector2((r.X + r.Width), (r.Y + r.Height))) ||
+			   LineIntersectsLine(p1, p2, new Vector2(r.X, r.Y), new Vector2(r.X, (r.Y + r.Height))) ||
+			   LineIntersectsLine(p1, p2, new Vector2((r.X + r.Width), r.Y), new Vector2((r.X + r.Width), (r.Y + r.Height)));
 	}
 
 	public static float RandomFloat(float min, float max){
@@ -24,7 +26,7 @@ public static class Tools{
 		}
 	}
 
-	public static bool IsColliding(RectangleF a, RectangleF b){
+	public static bool IsColliding(Rectangle a, Rectangle b){
 		if (a.X + a.Width  < b.X) return false; 
 		if (a.X > b.X + b.Width)  return false;
 		if (a.Y + a.Height < b.Y) return false; 
@@ -33,7 +35,7 @@ public static class Tools{
 		return true;
 	}
 
-	public static bool LineIntersectsLine(PointF a1, PointF a2, PointF b1, PointF b2){
+	public static bool LineIntersectsLine(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2){
 		float d = (a2.X - a1.X) * (b2.Y - b1.Y) - (a2.Y - a1.Y) * (b2.X - b1.X);
 		if (d == 0) return false; // Parallel lines
 
@@ -43,11 +45,11 @@ public static class Tools{
 		return (u >= 0 && u <= 1) && (v >= 0 && v <= 1);
 	}
 	
-	public static float GetDistance(PointF p1, PointF p2){
+	public static float GetDistance(Vector2 p1, Vector2 p2){
 		return (float)Math.Sqrt(Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2));
 	}
 	
-	public static float GetDistanceSquared(PointF p1, PointF p2){
+	public static float GetDistanceSquared(Vector2 p1, Vector2 p2){
 		return (float)(Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2));
 	}
 	
@@ -56,7 +58,7 @@ public static class Tools{
 		return diff < -180 ? diff + 360 : diff;
 	}
 
-	public static bool IsCircleColliding(PointF center1, float radius1, PointF center2, float radius2){
+	public static bool IsCircleColliding(Vector2 center1, float radius1, Vector2 center2, float radius2){
 		float combinedradius = radius1 + radius2;
 		
 		float dx = center1.X - center2.X;
@@ -66,9 +68,9 @@ public static class Tools{
 		return distanceSquared < (combinedradius * combinedradius);
 	}
 
-	public static PointF Scalar2Vect_Speed(float rot, float scalarspeed){
+	public static Vector2 Scalar2Vect_Speed(float rot, float scalarspeed){
 		double rot_radians = (rot)*0.0174533; 
-		PointF speed = new PointF(
+		Vector2 speed = new Vector2(
 			(float)(scalarspeed*Math.Cos(rot_radians)),
 			(float)(scalarspeed*Math.Sin(rot_radians))
 		);
@@ -79,7 +81,7 @@ public static class Tools{
 		return IsCircleColliding(obj1.center, obj1.radius, obj2.center, obj2.radius); 
 	}
 
-	public static PointF SwapPointF(PointF p){
+	public static Vector2 SwapPointF(Vector2 p){
 		float holder = p.X;
 		p.X = -p.Y;
 		p.Y = holder;
@@ -88,7 +90,7 @@ public static class Tools{
 	}
 
 	// not used
-	public static PointF RotateVector(PointF vector, float rotationDegrees){
+	public static Vector2 RotateVector(Vector2 vector, float rotationDegrees){
 		double radians = rotationDegrees * (Math.PI / 180.0);
 
 		float cos = (float)Math.Cos(radians);
@@ -97,6 +99,10 @@ public static class Tools{
 		float newX = vector.X * cos - vector.Y * sin;
 		float newY = vector.X * sin + vector.Y * cos;
 
-		return new PointF(newX, newY);
+		return new Vector2(newX, newY);
 	}
 }
+
+
+
+

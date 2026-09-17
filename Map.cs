@@ -1,18 +1,22 @@
+using System;
+using System.Numerics;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
-using System.Drawing.Imaging;
+using System.Linq;
+using Raylib_cs;
 
 public class Map{
 	
-	public Image[,] gmap;
 	public int[,] map;
 	public int[,] secondLayer;
 	public int[,] collision;
 
-	public Size worldsize;
-	public Size mapsize;
+	public Vector2 worldsize;
+	public Vector2 mapsize;
 
 	public List<Building> buildings = new List<Building>();
-	public Image[] tileMap;
+	public Texture2D[] tileMap;
 	public int tileDimension;
 	public int tileRenderDimension;
 
@@ -29,7 +33,7 @@ public class Map{
 
 		var dimension = GetMapDimension(filepathMap[0]);
 		Console.WriteLine($"Size of map = {dimension.Item2}:{dimension.Item1}");
-		this.mapsize = new Size(dimension.Item2, dimension.Item1);
+		this.mapsize = new Vector2(dimension.Item2, dimension.Item1);
 
 		map = CreateMapArray(filepathMap[0],dimension);
 		secondLayer = CreateMapArray(filepathMap[1],dimension);
@@ -40,10 +44,9 @@ public class Map{
 		tileRenderDimension = 64;
 		tileMap = ExtractTiles(filepathTileset, tileDimension);
 
-		gmap = BuildMapImages(map, secondLayer, tileMap);
 		CreateBuildings(buildingsLayer);
 		
-		this.worldsize = new Size(dimension.height * tileRenderDimension, dimension.width * tileRenderDimension);
+		this.worldsize = new Vector2(dimension.height * tileRenderDimension, dimension.width * tileRenderDimension);
 	}
 
 	void CreateBuildings(int[,] map){
@@ -69,49 +72,6 @@ public class Map{
             }
         }
 	}
-	
-	Image?[,] BuildMapImages(int[,] pmap, int[,] map_layer2, Image[] pTiles){
-		Size mapSize = new Size(tileRenderDimension*map.GetLength(0), tileRenderDimension*map.GetLength(1));
-		int maxColumns = (int)Math.Ceiling((float)mapSize.Width/Game.windowWidth);
-		int maxRows = (int)Math.Ceiling((float)mapSize.Height/Game.windowHeight);
-
-		Image?[,] mapImages = new Image[maxColumns, maxRows]; 
-		for(int i=0;i<maxColumns;i++) for(int j=0;j<maxRows;j++)
-			mapImages[i,j] = BuildMapImage(pmap, map_layer2, pTiles, i, j, mapSize);
-	
-		return mapImages;
-	}
-
-	Image? BuildMapImage(int[,] pmap, int[,] pmap2, Image[] pTiles, int column, int row, Size mapSize){
-		Image mapImage = new Bitmap(Game.windowWidth+1, Game.windowHeight+1);
-		Point position = new Point(column * Game.windowWidth, row * Game.windowHeight);
-
-		if(position.X > mapSize.Width) return null;
-		if(position.Y > mapSize.Height) return null;
-
-		using (Graphics g = Graphics.FromImage(mapImage)){
-			int initI = (int)position.X/tileRenderDimension;
-			int maxCol = (int)(position.X+Game.windowWidth)/tileRenderDimension;
-			if(maxCol > pmap.GetLength(0)) maxCol = pmap.GetLength(0);
-
-			int initJ = (int)position.Y/tileRenderDimension;
-			int maxRow = (int)(position.Y+Game.windowHeight)/tileRenderDimension;	
-			if(maxRow > pmap.GetLength(1)) maxRow = pmap.GetLength(1);
-
-			int i,j;
-			for(i=initI;i<maxCol;i++){
-				for(j=initJ;j<maxRow;j++){
-					if(pmap[i,j] == -1) continue;
-					g.DrawImage(tileMap[pmap[i,j]], (i-initI)*tileRenderDimension, (j-initJ)*tileRenderDimension, tileRenderDimension+1, tileRenderDimension+1); 
-					if(pmap2[i,j] == -1) continue;
-					g.DrawImage(tileMap[pmap2[i,j]], (i-initI)*tileRenderDimension, (j-initJ)*tileRenderDimension, tileRenderDimension+1, tileRenderDimension+1); 
-				}
-			}
-		}
-		
-		//mapImage.Save($"MyImage{column}_{row}.png", ImageFormat.Png);
-		return mapImage;
-	}
 
 	public (int x, int y) GetTileFromCoordinates(float x, float y){
 		int c = (int)Math.Floor(x/tileRenderDimension);
@@ -123,42 +83,42 @@ public class Map{
 		return (c, r);
 	}
 
-	public (int x, int y) GetTileFromCoordinates(PointF dot){
+	public (int x, int y) GetTileFromCoordinates(Vector2 dot){
 		return GetTileFromCoordinates(dot.X, dot.Y);
 	}
 
-	Image[] ExtractTiles(string filepath, int tileSize){
-		Image tileset = Image.FromStream(new MemoryStream(File.ReadAllBytes(filepath)));
+	Texture2D[] ExtractTiles(string filepath, int tileSize){
+		Texture2D tileset = Raylib.LoadTexture(filepath);
 
 		int columns = tileset.Width / tileSize;
 		int rows = tileset.Height / tileSize;
 		
-		Image[] tileMap = new Image[rows*columns];
+		Texture2D[] tileMapArr = new Texture2D[rows*columns];
 
-		for(int r=0; r<rows; r++) for(int c=0;c<columns; c++)
-			tileMap[ (r*columns)+c ] = ExtractTile(tileset, c, r, tileSize);
+		for(int r=0; r<rows; r++) {
+            for(int c=0;c<columns; c++) {
+			    tileMapArr[ (r*columns)+c ] = ExtractTile(tileset, c, r, tileSize);
+            }
+        }
 		
-		return tileMap;
+		return tileMapArr;
 	}
 
-	Image ExtractTile(Image tileset, int column, int row, int tileSize){
+	Texture2D ExtractTile(Texture2D tileset, int column, int row, int tileSize){
 		int x = column * tileSize;
 		int y = row * tileSize;
 
-		Image tile = new Bitmap(tileSize, tileSize);
+        // In Raylib we don't necessarily need to create a new texture per tile
+        // But to keep it close to original logic, we can load a cropped image.
+        Image img = Raylib.LoadImageFromTexture(tileset);
+        Raylib.ImageCrop(ref img, new Rectangle(x, y, tileSize, tileSize));
+        Texture2D tile = Raylib.LoadTextureFromImage(img);
+        Raylib.UnloadImage(img);
 
-		using (Graphics g = Graphics.FromImage(tile))
-		{
-			Rectangle sourceRect = new Rectangle(x, y, tileSize, tileSize);
-			Rectangle destRect = new Rectangle(0, 0, tileSize, tileSize);
-			g.DrawImage(tileset, destRect, sourceRect, GraphicsUnit.Pixel);
-		}
-	
 		return tile;
 	}
 
 	(int width, int height) GetMapDimension(string path){
-
 		int countLine=0;
 		int countCommas = 0;
 

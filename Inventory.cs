@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 public class Inventory{
 	Player? owner=null;
 
@@ -39,3 +41,4 @@ public class Inventory{
 		owner = p;
 	}
 }
+

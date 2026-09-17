@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 public static class ItemDropFootprints{
 	public static List<ItemDrop> ammo = new List<ItemDrop>();
 	public static List<ItemDrop> guns = new List<ItemDrop>();
@@ -29,3 +31,4 @@ public static class ItemDropFootprints{
 		return guns[index];
 	}
 }
+

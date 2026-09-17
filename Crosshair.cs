@@ -1,22 +1,24 @@
+using System.Numerics;
+using Raylib_cs;
 public class Crosshair{
 	public bool isOn = false;
-	public RectangleF r;
+	public Rectangle r;
 	
 	bool hasTarget=false;
 	public bool isLockedOnTarget=false;
 
-	PointF target;
+	Vector2 target;
 	
 	Sprite onTarget;
 	Sprite defaultC;
 
 	Sprite sprite;
 
-	public Image image{get => sprite.frame;}
+	public Texture2D Texture2D{get => sprite.frame;}
 	
 	public Crosshair(string[] crosshair1, string[] crosshair2){
-		r.Size = new Size(70, 70);
-		r.Location = new PointF(20, 20);
+		r.Width = 70; r.Height = 70;
+		r.X = (new Vector2(20, 20)).X; r.Y = (new Vector2(20, 20)).Y;
 
 		defaultC = new Sprite(crosshair1);
 		onTarget = new Sprite(crosshair2);
@@ -28,7 +30,7 @@ public class Crosshair{
 		if(hasTarget == false || isLockedOnTarget == true) return;
 		float lerpFactor = 0.15f;
 
-		PointF diff = new PointF(target.X - r.X, target.Y - r.Y);
+		Vector2 diff = new Vector2(target.X - r.X, target.Y - r.Y);
 		r.Y += diff.Y*lerpFactor;
 		r.X += diff.X*lerpFactor;
 
@@ -43,7 +45,7 @@ public class Crosshair{
 		hasTarget = true;
 		isLockedOnTarget = false;
 		sprite = defaultC; 
-		target = new PointF(x-r.Width/2, y-r.Height/2);
+		target = new Vector2(x-r.Width/2, y-r.Height/2);
 	}
 
 	public void SetPosition(float x, float y){
@@ -51,3 +53,8 @@ public class Crosshair{
 		r.Y = y-r.Height/2;
 	}
 }
+
+
+
+
+

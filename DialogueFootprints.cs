@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 public static class DialogueFootprints{
  	public static List<Dialogue> Dialogues= new List<Dialogue>(); 
 	public static void Init(){
@@ -9,3 +11,4 @@ They’re at the shipping yard right now, probably feeling real safe. Go ruin th
 What are you still standing here for? Go get fat on 'em.", Resources.Heads._chillguy, Resources.Dialogues.D1)); 
 	}
 }
+

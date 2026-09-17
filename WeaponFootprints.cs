@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 public class WeaponFootprints{
 	public List<Weapon> list = new List<Weapon>();
 	
@@ -5,7 +7,7 @@ public class WeaponFootprints{
 		list.AddRange(
 			new Weapon(40){
 			   sprite=new Sprite(Resources.Weapon._weapon1,0,4),
-			   dimensions=new Size(20,20),
+			   dimensions=new Vector2(20,20),
 			   phase = 1000,
 			   damage=45,
 			   ammoType=ItemDrop.Type.Smallbullets,
@@ -15,7 +17,7 @@ public class WeaponFootprints{
 
 			new Weapon(40){
 			   sprite=new Sprite(Resources.Weapon._weapon2,0,4),
-			   dimensions=new Size(20,20),
+			   dimensions=new Vector2(20,20),
 			   phase = 1000,
 			   damage=35,
 			   ammoType=ItemDrop.Type.Smallbullets,
@@ -27,7 +29,7 @@ public class WeaponFootprints{
 
 			new Weapon(40){
 			   sprite=new Sprite(Resources.Weapon._weapon3,0,3),
-			   dimensions=new Size(20,20),
+			   dimensions=new Vector2(20,20),
 			   phase = 200,
 			   damage=35,
 			   ammoType=ItemDrop.Type.Bullets,
@@ -39,7 +41,7 @@ public class WeaponFootprints{
 
 			new Weapon(40){
 			   sprite=new Sprite(Resources.Weapon._weapon4,0,2),
-			   dimensions=new Size(20,20),
+			   dimensions=new Vector2(20,20),
 			   phase = 1000,
 			   damage=26,
 			   ammoType=ItemDrop.Type.Bullets,
@@ -51,7 +53,7 @@ public class WeaponFootprints{
 
 			new Weapon(40){
 			   sprite=new Sprite(Resources.Weapon._weapon5,0,4),
-			   dimensions=new Size(20,20),
+			   dimensions=new Vector2(20,20),
 			   phase = 1000,
 			   damage= 50,
 			   ammoType=ItemDrop.Type.Rockets,
@@ -63,7 +65,7 @@ public class WeaponFootprints{
 
 			new Weapon(40){
 			   sprite=new Sprite(Resources.Weapon._weapon6,0,2),
-			   dimensions=new Size(20,20),
+			   dimensions=new Vector2(20,20),
 			   phase = 1000,
 			   damage=35,
 			   ammoType=ItemDrop.Type.Bullets,
@@ -75,7 +77,7 @@ public class WeaponFootprints{
 
 			new Weapon(40){
 			   sprite=new Sprite(Resources.Weapon._weapon8,0,4),
-			   dimensions=new Size(20,20),
+			   dimensions=new Vector2(20,20),
 			   phase = 1000,
 			   damage=35,
 			   ammoType=ItemDrop.Type.Bullets,
@@ -87,3 +89,5 @@ public class WeaponFootprints{
 		);
 	}
 }
+
+

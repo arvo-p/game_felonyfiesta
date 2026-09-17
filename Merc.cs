@@ -1,10 +1,12 @@
+using System.Numerics;
+using Raylib_cs;
 public class Merc : Enemy{
  	public Merc(){
     	Init();
 	}
 
-	public Merc(PointF pos){
-		r.Location = pos;
+	public Merc(Vector2 pos){
+		r.X = (pos).X; r.Y = (pos).Y;
 		Init();
 	}
 
@@ -15,3 +17,7 @@ public class Merc : Enemy{
 		dead = new Sprite(Resources.Merc._death, -1, 4);
 	}
 }
+
+
+
+

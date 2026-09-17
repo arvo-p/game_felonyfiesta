@@ -1,26 +1,33 @@
-using System.Runtime.InteropServices;
+using System.Numerics;
+using Raylib_cs;
+using System;
+using Raylib_cs;
 
 namespace game;
 
 static class Program
 {
-    /// <summary>
-    ///  The main entry point for the application.
-    /// </summary>
-	[DllImport("kernel32", SetLastError = true)]
-    private static extern bool AttachConsole(int dwProcessId);
-
-    [DllImport("user32.dll")]
-    private static extern IntPtr GetForegroundWindow();
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
-
-    [STAThread]
     static void Main()
     {
-       AttachConsole(-1);
-       ApplicationConfiguration.Initialize();
-       Application.Run(new Form1());
+        int windowWidth = 1024 + 256;
+        int windowHeight = 512 + 256;
+        
+        Raylib.InitWindow(windowWidth, windowHeight, "Petty Goober - Raylib");
+        Raylib.SetTargetFPS(60);
+        Raylib.InitAudioDevice();
+        
+        // Form1 is not used for Game loop now, but Game.Init handles setup.
+        // We need to refactor Game.cs heavily so we'll just initialize directly here.
+        Game.Init(windowWidth, windowHeight);
+        
+        while (!Raylib.WindowShouldClose())
+        {
+            Game.Loop();
+        }
+        
+        Game.End();
+        Raylib.CloseAudioDevice();
+        Raylib.CloseWindow();
     }    
 }
+

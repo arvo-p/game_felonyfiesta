@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,7 +16,7 @@ public class Weapon{
 	}
 
 	public required float damage{ get; set; }
-	public required Size dimensions{ get; set; }
+	public required Vector2 dimensions{ get; set; }
 	public required Sprite sprite{ get; set; }
 	public required short phase{ get; set; }
 	Player? owner;
@@ -112,3 +114,4 @@ public class Weapon{
 		isShooting = false;
 	}
 }
+

@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 public class LevelManager{
 	Environment env;
 	internal List<Enemy> managedEnemies = new List<Enemy>();
@@ -61,7 +63,7 @@ public class LevelManager{
 			
 			for(int i=0;i<countGenerateEnemies;i++){
 				Enemy e = RandomEnemy();
-				//Enemy e = new Thug(SpawnCoordinates(env.p.r.Location,300));
+				//Enemy e = new Thug(SpawnCoordinates(env.p.new Vector2(r.X, r.Y),300));
 				
 				managedEnemies.Add(e);
 				env.All.Add(e);
@@ -76,25 +78,25 @@ public class LevelManager{
 		int choice = r.Next(0, 3);
 		if(env.players.Count == 0) return new Thug();
 
-		PointF playerLoc = env.players[0].r.Location;
+		Vector2 playerLoc = new Vector2(env.players[0].r.X, env.players[0].r.Y);
 		if(choice == 0) return new Thug(SpawnCoordinates(playerLoc,300));
 		if(choice == 1) return new Merc(SpawnCoordinates(playerLoc,300));
 		if(choice == 2) return new Doctor(SpawnCoordinates(playerLoc,300));
 		return new Thug();
 	}
 	
-	public PointF SpawnCoordinates(PointF center, int spawnRadius){
+	public Vector2 SpawnCoordinates(Vector2 center, int spawnRadius){
 		Random rand = new Random();
-		int mapWidth = env.map.worldsize.Width;
-		int mapHeight = env.map.worldsize.Height;
+		int mapWidth = (int)env.map.worldsize.X;
+		int mapHeight = (int)env.map.worldsize.Y;
 		int tileSize = env.map.tileRenderDimension;
 		int entitySize = 64; 
 		int maxAttempts = 30;
 		
 		for(int i = 0; i < maxAttempts; i++){
-			Point quadrant = new Point(rand.Next(0, 2) == 0? -1:1, rand.Next(0, 2) == 0? -1:1);
-			int randomX = (int)center.X + quadrant.X*(Game.windowWidth/2+spawnRadius) + rand.Next(-spawnRadius, spawnRadius + 1); 
-			int randomY = (int)center.Y + quadrant.Y*(Game.windowHeight/2+spawnRadius) + rand.Next(-spawnRadius, spawnRadius + 1); 
+			Vector2 quadrant = new Vector2(rand.Next(0, 2) == 0? -1:1, rand.Next(0, 2) == 0? -1:1);
+			int randomX = (int)(center.X + quadrant.X*(Game.windowWidth/2+spawnRadius) + rand.Next(-spawnRadius, spawnRadius + 1)); 
+			int randomY = (int)(center.Y + quadrant.Y*(Game.windowHeight/2+spawnRadius) + rand.Next(-spawnRadius, spawnRadius + 1)); 
 			
 			// Ensure the entire entity footprint is within world bounds
 			if(randomX >= 0 && randomX + entitySize < mapWidth && randomY >= 0 && randomY + entitySize < mapHeight){
@@ -116,10 +118,15 @@ public class LevelManager{
 					}
 				}
 
-				if(isClear) return new PointF(randomX, randomY);
+				if(isClear) return new Vector2(randomX, randomY);
 			}
 		}
 		
-		return new PointF(0, 0);
+		return new Vector2(0, 0);
 	}
 }
+
+
+
+
+

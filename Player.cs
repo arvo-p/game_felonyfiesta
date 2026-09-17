@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 using System.Windows.Input;
 
 public class Player : Entity{
@@ -24,7 +26,7 @@ public class Player : Entity{
 	public Player(Crosshair crosshair){
 		this.env = Game.env;
 
-		mykeyboard = new Keyboard(new Keys[]{Keys.Z, Keys.Q, Keys.S, Keys.D, Keys.E, Keys.Space, Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.R, Keys.Enter, Keys.Tab});
+		mykeyboard = new Keyboard(new KeyboardKey[]{KeyboardKey.Z, KeyboardKey.Q, KeyboardKey.S, KeyboardKey.D, KeyboardKey.E, KeyboardKey.Space, KeyboardKey.One, KeyboardKey.Two, KeyboardKey.Three, KeyboardKey.Four, KeyboardKey.R, KeyboardKey.Enter, KeyboardKey.Tab});
 		autoaim = new Autoaim(this, crosshair);
 
 		LoadSprites();
@@ -33,8 +35,8 @@ public class Player : Entity{
 
 		setHealth(100);
 	
-		r.Location = new Point(0, 0);
-		r.Size = new Size(60, 60);
+		r.X = (new Vector2(0, 0)).X; r.Y = (new Vector2(0, 0)).Y;
+		r.Width = 60; r.Height = 60;
 		mass = 90;
 		SetCollisionCircles();
 
@@ -95,24 +97,24 @@ public class Player : Entity{
 			return;
 		}
 		
-		if(mykeyboard.GetKeyOnce(Keys.R))
+		if(mykeyboard.GetKeyOnce(KeyboardKey.R))
 			if(selectedWeapon != null) selectedWeapon.Reload();
 
 		if(autoaim.isAutoaiming){
-			if(mykeyboard.GetKeyOnce(Keys.Q)) autoaim.SelectNext(-1);
-			if(mykeyboard.GetKeyOnce(Keys.D)) autoaim.SelectNext(1);
+			if(mykeyboard.GetKeyOnce(KeyboardKey.Q)) autoaim.SelectNext(-1);
+			if(mykeyboard.GetKeyOnce(KeyboardKey.D)) autoaim.SelectNext(1);
 		}else{
-			if(mykeyboard.GetKey(Keys.Q)) rotation -= 7;
-			if(mykeyboard.GetKey(Keys.D)) rotation += 7;
+			if(mykeyboard.GetKey(KeyboardKey.Q)) rotation -= 7;
+			if(mykeyboard.GetKey(KeyboardKey.D)) rotation += 7;
 		}
 
-		if(mykeyboard.GetKey(Keys.Z)){
+		if(mykeyboard.GetKey(KeyboardKey.Z)){
 			lastGunHitSuccessful = false;
 			autoaim.Set(false);
 			speed += 3;
 		}
 
-		if(mykeyboard.GetKey(Keys.S)){
+		if(mykeyboard.GetKey(KeyboardKey.S)){
 			lastGunHitSuccessful = false;
 			autoaim.Set(false);
 			speed -= 3;
@@ -126,12 +128,12 @@ public class Player : Entity{
 			return;
 		}
 		
-		if(mykeyboard.GetKeyOnce(Keys.D1)) idxSelectedWeapon = 0;
-		if(mykeyboard.GetKeyOnce(Keys.D2)) idxSelectedWeapon = 1;
-		if(mykeyboard.GetKeyOnce(Keys.D3)) idxSelectedWeapon = 2;
-		if(mykeyboard.GetKeyOnce(Keys.D4)) idxSelectedWeapon = 3;
+		if(mykeyboard.GetKeyOnce(KeyboardKey.One)) idxSelectedWeapon = 0;
+		if(mykeyboard.GetKeyOnce(KeyboardKey.Two)) idxSelectedWeapon = 1;
+		if(mykeyboard.GetKeyOnce(KeyboardKey.Three)) idxSelectedWeapon = 2;
+		if(mykeyboard.GetKeyOnce(KeyboardKey.Four)) idxSelectedWeapon = 3;
 
-		if(mykeyboard.GetKey(Keys.Space)){
+		if(mykeyboard.GetKey(KeyboardKey.Space)){
 			if(speed < 0.3){
 				if(!(autoaim.isAutoaiming == true && autoaim.crosshair.isLockedOnTarget == false)){ //test
 					if(lastGunHitSuccessful == false && selectedWeapon != null && selectedWeapon.type != Weapon.Type.Melee){
@@ -146,7 +148,7 @@ public class Player : Entity{
 			} else StartAttack();
 		}
 
-		if(mykeyboard.GetKeyOnce(Keys.E)) if(ActionKey()) return;
+		if(mykeyboard.GetKeyOnce(KeyboardKey.E)) if(ActionKey()) return;
 	
 		speed = Math.Clamp(speed, -15, 15);
 	}
@@ -165,15 +167,15 @@ public class Player : Entity{
 
 		if(tm.playerState == TurnManager.PlayerTurnState.Selection){
 			// Rotate player (and arrow follows)
-			if(mykeyboard.GetKey(Keys.Q)) this.rotation -= 5;
-			if(mykeyboard.GetKey(Keys.D)) this.rotation += 5;
+			if(mykeyboard.GetKey(KeyboardKey.Q)) this.rotation -= 5;
+			if(mykeyboard.GetKey(KeyboardKey.D)) this.rotation += 5;
 
 			// Amplitude
-			if(mykeyboard.GetKey(Keys.Z)) tm.movementAmplitude = Math.Min(Math.Min(50, tm.movementAmplitude + 1), tm.playerAP/2);
-			if(mykeyboard.GetKey(Keys.S)) tm.movementAmplitude = Math.Max(0, tm.movementAmplitude - 1);
+			if(mykeyboard.GetKey(KeyboardKey.Z)) tm.movementAmplitude = Math.Min(Math.Min(50, tm.movementAmplitude + 1), tm.playerAP/2);
+			if(mykeyboard.GetKey(KeyboardKey.S)) tm.movementAmplitude = Math.Max(0, tm.movementAmplitude - 1);
 
 			// Confirm Move
-			if(mykeyboard.GetKeyOnce(Keys.Enter) && tm.movementAmplitude > 0){
+			if(mykeyboard.GetKeyOnce(KeyboardKey.Enter) && tm.movementAmplitude > 0){
 				int cost = (int)(tm.movementAmplitude * 2);
 				if(tm.playerAP >= cost){
 					this.speed = tm.movementAmplitude/3; 
@@ -184,25 +186,25 @@ public class Player : Entity{
 			}
 
 			// Enter Aiming Mode
-			if(mykeyboard.GetKeyOnce(Keys.Space)){
+			if(mykeyboard.GetKeyOnce(KeyboardKey.Space)){
 				autoaim.UpdateList();
 				if(autoaim.SelectNext(0)) tm.playerState = TurnManager.PlayerTurnState.Aiming;
 			}
 		}
 		else if(tm.playerState == TurnManager.PlayerTurnState.Aiming){
 			// Cycle targets
-			if(mykeyboard.GetKeyOnce(Keys.Q)) autoaim.SelectNext(-1);
-			if(mykeyboard.GetKeyOnce(Keys.D)) autoaim.SelectNext(1);
+			if(mykeyboard.GetKeyOnce(KeyboardKey.Q)) autoaim.SelectNext(-1);
+			if(mykeyboard.GetKeyOnce(KeyboardKey.D)) autoaim.SelectNext(1);
 
 			// Back to movement mode
-			if(mykeyboard.GetKeyOnce(Keys.Space)){
+			if(mykeyboard.GetKeyOnce(KeyboardKey.Space)){
 				autoaim.Set(false);
 				tm.playerState = TurnManager.PlayerTurnState.Selection;
 			}
 
 			// Confirm Shot
 			int cost = 20;
-			if(mykeyboard.GetKeyOnce(Keys.Enter)){
+			if(mykeyboard.GetKeyOnce(KeyboardKey.Enter)){
 				if(tm.playerAP > 0){
 					StartAttack();
 					tm.playerAP -= cost;
@@ -215,13 +217,13 @@ public class Player : Entity{
 		}
 
 		// Free actions (Weapon switching)
-		if(mykeyboard.GetKeyOnce(Keys.D1)) idxSelectedWeapon = 0;
-		if(mykeyboard.GetKeyOnce(Keys.D2)) idxSelectedWeapon = 1;
-		if(mykeyboard.GetKeyOnce(Keys.D3)) idxSelectedWeapon = 2;
-		if(mykeyboard.GetKeyOnce(Keys.D4)) idxSelectedWeapon = 3;
+		if(mykeyboard.GetKeyOnce(KeyboardKey.One)) idxSelectedWeapon = 0;
+		if(mykeyboard.GetKeyOnce(KeyboardKey.Two)) idxSelectedWeapon = 1;
+		if(mykeyboard.GetKeyOnce(KeyboardKey.Three)) idxSelectedWeapon = 2;
+		if(mykeyboard.GetKeyOnce(KeyboardKey.Four)) idxSelectedWeapon = 3;
 
 		// End Turn manually
-		if(mykeyboard.GetKeyUp(Keys.Tab)){
+		if(mykeyboard.GetKeyUp(KeyboardKey.Tab)){
             tm.playerAP = 0;
 			tm.playerState = TurnManager.PlayerTurnState.Moving;
 		}
@@ -279,9 +281,9 @@ public class Player : Entity{
 		if(isDead) return;
 		
 		health += -(int)damage;
-		velRepulsion = new PointF((float)Math.Cos(rotation)*2, (float)Math.Sin(rotation)*2);
+		velRepulsion = new Vector2((float)Math.Cos(rotation)*2, (float)Math.Sin(rotation)*2);
 
-		Blood.SprayBlood(r.Location, new PointF((float)Math.Cos(radians),(float)Math.Sin(radians)));
+		Blood.SprayBlood(new Vector2(r.X, r.Y), new Vector2((float)Math.Cos(radians),(float)Math.Sin(radians)));
 	}
 
 	public void TakeItem(ItemDrop item){
@@ -304,3 +306,10 @@ public class Player : Entity{
 		countWeapon = (short)weapons.Count;
 	}
 }
+
+
+
+
+
+
+

@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 public static class ItemDropEffects{
 	public static bool Ammo(Player player, int quantity, ItemDrop.Type type){
 		if(player.inventory==null) return false;
@@ -10,3 +12,4 @@ public static class ItemDropEffects{
 		return true;
 	}
 }
+

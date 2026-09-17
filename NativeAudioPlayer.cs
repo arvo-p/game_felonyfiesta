@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -191,3 +193,4 @@ public class NativeAudioPlayer : IDisposable
         _hardwareSignal.Dispose();
     }
 }
+

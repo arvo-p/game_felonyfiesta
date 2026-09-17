@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Numerics;
+using Raylib_cs;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -199,7 +200,7 @@ public static class SaveSystem{
 
 		foreach(var npcData in data.NPCs){
 			Enemy? npc = null;
-			PointF pos = new PointF(npcData.X, npcData.Y);
+			Vector2 pos = new Vector2(npcData.X, npcData.Y);
 			if(npcData.Type == "Thug") npc = new Thug(pos);
 			else if(npcData.Type == "Merc") npc = new Merc(pos);
 			else if(npcData.Type == "Doctor") npc = new Doctor(pos);
@@ -256,3 +257,4 @@ public static class SaveSystem{
             }
     }
 }
+

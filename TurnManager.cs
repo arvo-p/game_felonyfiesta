@@ -1,6 +1,7 @@
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
+using System.Numerics;
+using Raylib_cs;
+
 using System.Linq;
 
 public class TurnManager {
@@ -228,60 +229,56 @@ public class TurnManager {
         }
     }
 
-    public void Draw(Graphics g) {
+    public void Draw() {
 		if(currentState != TurnState.PlayerTurn) return;
 
         if(Game.activeState != Game.State.Playing || !Game.isTurnBased) return;
 		if(playerState == PlayerTurnState.Selection)
-		   DrawMovementArrow(g);
+		   DrawMovementArrow();
 		else if (playerState == PlayerTurnState.Aiming)
-			DrawAimingText(g);
+			DrawAimingText();
 
-        DrawAPBar(g);
+        DrawAPBar();
     }
 
-    private void DrawAimingText(Graphics g) {
-        PointF screenPos =
-            Game.camera.WorldToScreen(currentActivePlayer.center);
+    private void DrawAimingText() {
+        if(currentActivePlayer == null) return;
+        Vector2 screenPos = Game.camera.WorldToScreen(currentActivePlayer.center);
 
-        g.DrawString("AIMING MODE - [Q/D] CHANGE TARGET - [ENTER] FIRE",
-                     SystemFonts.DefaultFont, Brushes.Orange, screenPos.X - 120,
-                     screenPos.Y - 60);
+        Raylib.DrawText("AIMING MODE - [Q/D] CHANGE TARGET - [ENTER] FIRE", (int)screenPos.X - 120, (int)screenPos.Y - 60, 20, Color.Orange);
     }
 
-    private void DrawMovementArrow(Graphics g) {
+    private void DrawMovementArrow() {
 		if(currentActivePlayer==null) return;
 
         Player p = currentActivePlayer;
-        PointF pPos = p.center;
-        PointF screenPos = Game.camera.WorldToScreen(pPos);
+        Vector2 pPos = p.center;
+        Vector2 screenPos = Game.camera.WorldToScreen(pPos);
         float rad = p.rotation * (MathF.PI / 180f);
         float length = movementAmplitude * 5;
-        using (Pen pen = new Pen(Color.Lime, 4)) {
-            pen.CustomEndCap = new AdjustableArrowCap(5, 5);
-
-            g.DrawLine(pen, screenPos.X, screenPos.Y,
-                       screenPos.X + MathF.Cos(rad) * length,
-                       screenPos.Y + MathF.Sin(rad) * length);
-        }
+        
+        Vector2 endPos = new Vector2(screenPos.X + MathF.Cos(rad) * length, screenPos.Y + MathF.Sin(rad) * length);
+        Raylib.DrawLineEx(screenPos, endPos, 4, Color.Lime);
+        
+        // Draw an arrowhead (simplified)
+        Raylib.DrawCircleV(endPos, 5, Color.Lime);
 
         int cost = (int)(movementAmplitude * 2);
 
-        g.DrawString($"COST: {cost} AP", SystemFonts.DefaultFont, Brushes.Lime,
-                     screenPos.X + 20, screenPos.Y - 40);
+        Raylib.DrawText($"COST: {cost} AP", (int)screenPos.X + 20, (int)screenPos.Y - 40, 20, Color.Lime);
     }
 
-    private void DrawAPBar(Graphics g) {
+    private void DrawAPBar() {
         int barW = 200;
         int barH = 20;
         int x = (Game.windowWidth - barW) / 2;
         int y = Game.windowHeight - 50;
-        g.FillRectangle(Brushes.Black, x, y, barW, barH);
-        g.FillRectangle(Brushes.DeepSkyBlue, x, y, (barW * playerAP) / 100,
-                        barH);
+        
+        Raylib.DrawRectangle(x, y, barW, barH, Color.Black);
+        Raylib.DrawRectangle(x, y, (barW * playerAP) / 100, barH, Color.SkyBlue);
+        Raylib.DrawRectangleLinesEx(new Rectangle(x, y, barW, barH), 2, Color.White);
 
-        g.DrawRectangle(Pens.White, x, y, barW, barH);
-        g.DrawString($"AP: {playerAP} / 100", SystemFonts.DefaultFont,
-                     Brushes.White, x + barW + 10, y);
+        Raylib.DrawText($"AP: {playerAP} / 100", x + barW + 10, y, 20, Color.White);
     }
 }
+

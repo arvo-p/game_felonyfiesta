@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 public class Vehicle : Entity{
 
 	Keyboard? mykeyboard;
@@ -20,21 +22,21 @@ public class Vehicle : Entity{
 		this.inverted_vectors = true;
 		
 		_sprite = new Sprite(Resources.Vehicle._car);
-		r.Location = new Point(600, 600);
-		r.Size = new Size((int)(105-10), (int)(200-10));
+		r.X = (new Vector2(600, 600)).X; r.Y = (new Vector2(600, 600)).Y;
+		r.Width = 95; r.Height = 190;
 		mass = 900;
 		SetCollisionCircles();
 		setHealth(100);
 
 		props = new List<Prop>();
-		shadow = new Prop(Resources.Vehicle._carshadow, new RectangleF(0, 0, r.Width, r.Height), this.rotation);
+		shadow = new Prop(Resources.Vehicle._carshadow, new Rectangle(0, 0, r.Width, r.Height), this.rotation);
 	}
 
 	private void HandleInput(){
 		if(mykeyboard == null) return;
 		mykeyboard.ReadKeys();
 
-		if(mykeyboard.GetKeyOnce(Keys.E)){
+		if(mykeyboard.GetKeyOnce(KeyboardKey.E)){
 			LeaveCar();
 			return;
 		}
@@ -46,11 +48,11 @@ public class Vehicle : Entity{
 		if(Math.Abs(speed) > 1){
 			float speedFactor = Math.Abs(speed) / (maxspeed);
 			float deltarot=0;
-			if(mykeyboard.GetKey(Keys.Q)){
+			if(mykeyboard.GetKey(KeyboardKey.Q)){
 				isTurning = -1;
 				deltarot = -2/((1-speedFactor*0.5f));
 			}
-			if(mykeyboard.GetKey(Keys.D)){
+			if(mykeyboard.GetKey(KeyboardKey.D)){
 				isTurning = 1;
 				deltarot = 2/((1-speedFactor*0.5f));
 			}
@@ -62,11 +64,11 @@ public class Vehicle : Entity{
 		}
 		
 		isAccelerating = 0;
-		if(mykeyboard.GetKey(Keys.Z)){
+		if(mykeyboard.GetKey(KeyboardKey.Z)){
 			if(speed < maxspeed - 0.3f) isAccelerating = 1;
 			speed += 1.6f;
 		}
-		if(mykeyboard.GetKey(Keys.S)){
+		if(mykeyboard.GetKey(KeyboardKey.S)){
 			if(speed > -maxspeed/2 + 0.3f) isAccelerating = -1;
 			speed -= 1.6f;
 		}
@@ -90,7 +92,7 @@ public class Vehicle : Entity{
 			p.isKeyboardOn = true;
 			p.inside = null;
 		}
-		env.UpdatePosition(passenger, new PointF(r.X-64-passenger.X, r.Y-64-passenger.Y));
+		env.UpdatePosition(passenger, new Vector2(r.X-64-passenger.X, r.Y-64-passenger.Y));
 		Game.camera.Follow(passenger);
 		
 		env.All.Add(passenger);
@@ -109,10 +111,18 @@ public class Vehicle : Entity{
 	   float y = (float)(rand.NextDouble() * 30) + 20;
         
 		if(countSmoke++ < 5)
-			props.Add(new Prop(Resources.Environments._smoke, new RectangleF(x, y, 64, 64), this.rotation+90));
+			props.Add(new Prop(Resources.Environments._smoke, new Rectangle(x, y, 64, 64), this.rotation+90));
 	}
 
 	public override void Update(){
 		if(mykeyboard != null) HandleInput();
 	}
 }
+
+
+
+
+
+
+
+

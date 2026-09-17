@@ -1,11 +1,13 @@
+using System.Numerics;
+using Raylib_cs;
 using System.Media;
 public class Thug : Enemy{
 	public Thug(){
 		Init();
 	}
 
-	public Thug(PointF pos){
-		r.Location = pos;
+	public Thug(Vector2 pos){
+		r.X = (pos).X; r.Y = (pos).Y;
 		Init();
 	}
 
@@ -19,3 +21,7 @@ public class Thug : Enemy{
 		dead = new Sprite(Resources.Thug._death, -1, 4);
 	}
 }
+
+
+
+

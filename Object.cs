@@ -1,10 +1,12 @@
+using System.Numerics;
+using Raylib_cs;
 public class Object{
 	protected Environment env = null!;
 	
 	public bool isSolid = true;
 	public bool isVisible = true;
 
-	public RectangleF r;
+	public Rectangle r;
 	public float X{get=>r.X;}
 	public float Y{get=>r.Y;}
 	public float Width{get=>r.Width;}
@@ -22,7 +24,7 @@ public class Object{
 	public List<Prop>? props = null;
 	protected bool inverted_vectors=false;
 
-	public PointF velRepulsion = new PointF(0,0);
+	public Vector2 velRepulsion = new Vector2(0,0);
 	
 	float _rotation;
 	public float rotation{
@@ -33,8 +35,8 @@ public class Object{
 		get => _rotation;
 	}
 
-	PointF? _center=null;
-	public PointF center{
+	Vector2? _center=null;
+	public Vector2 center{
 		get{
 			if(_center == null) PositionUpdated();
 			return _center!.Value;
@@ -47,7 +49,7 @@ public class Object{
 	public Sprite _spriteNext = null!;
 
 	public virtual Sprite sprite{get => _sprite;}
-    public Image image{get => sprite.frame;}
+    public Texture2D Texture2D{get => sprite.frame;}
 
 	public Object(){
 	}
@@ -58,7 +60,7 @@ public class Object{
 	public void Collision(Object obj){
 	}
 
-	public PointF movement = new PointF(0, 0);
+	public Vector2 movement = new Vector2(0, 0);
 	public virtual void UpdateRoutine(){
 		Update();
 	
@@ -86,7 +88,7 @@ public class Object{
 	}
 
 	public void PositionUpdated(){
-		_center = new PointF(r.X+r.Width/2,r.Y+r.Height/2);
+		_center = new Vector2(r.X+r.Width/2,r.Y+r.Height/2);
 	}
 
 	public void SetCollisionCircles(){
@@ -107,7 +109,7 @@ public class Object{
 		}
 	}
 
-	public void TransferForce(PointF incomingVelocity, int incomingMass){
+	public void TransferForce(Vector2 incomingVelocity, int incomingMass){
 		float targetMass = this.mass > 0 ? this.mass : 50; // Default mass if not set
 		float massRatio = (float)incomingMass / targetMass;
 		
@@ -118,3 +120,5 @@ public class Object{
 		velRepulsion.Y += incomingVelocity.Y * massRatio;
 	}
 }
+
+

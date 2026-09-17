@@ -1,13 +1,15 @@
+using System.Numerics;
+using Raylib_cs;
 public class Prop{
 	public Environment env = null!;
 	public Sprite sprite;
-	public RectangleF r;
+	public Rectangle r;
 	public float rotation;
 	public int layer;
 
-	public Image image{get => sprite.frame;}
+	public Texture2D Texture2D{get => sprite.frame;}
 
-	public Prop(string[] resources, RectangleF r, float rot){
+	public Prop(string[] resources, Rectangle r, float rot){
 		this.env = Game.env;
 		this.rotation = rot;
 		this.sprite = new Sprite(resources,0,6,true);
@@ -20,3 +22,5 @@ public class Prop{
 		this.rotation = rot;
 	}*/
 }
+
+

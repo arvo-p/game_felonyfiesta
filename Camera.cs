@@ -1,7 +1,9 @@
+using System.Numerics;
+using Raylib_cs;
 public class Camera{
 	
 	public Object? follow;
-	public RectangleF r{get => follow?.r ?? RectangleF.Empty;}
+	public Rectangle r{get => follow?.r ?? new Rectangle(0, 0, 0, 0);}
 
 	public Camera(){}
 
@@ -9,10 +11,13 @@ public class Camera{
 		this.follow = f;
 	}
 
-	public PointF WorldToScreen(PointF worldPos)
+	public Vector2 WorldToScreen(Vector2 worldPos)
 	{
 		float offsetX = (Game.windowWidth / 2) - r.X;
 		float offsetY = (Game.windowHeight / 2) - r.Y;
-		return new PointF(worldPos.X + offsetX, worldPos.Y + offsetY);
+		return new Vector2(worldPos.X + offsetX, worldPos.Y + offsetY);
 	}
 }
+
+
+

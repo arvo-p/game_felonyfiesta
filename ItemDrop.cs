@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 using System; 
 
 public class ItemDrop : Object{
@@ -60,3 +62,4 @@ public class ItemDrop : Object{
 		SetCollisionCircles();
 	}
 }
+

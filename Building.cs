@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 public class Building{
     public float X, Y, Width, Height, Height3D;
 	public int rot=0;
@@ -49,3 +51,4 @@ public class Building{
 	}
 	#endregion
 }
+

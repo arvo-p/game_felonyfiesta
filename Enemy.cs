@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 
 using System.Media;
 public class Enemy : Entity{
@@ -11,7 +13,7 @@ public class Enemy : Entity{
 	protected Player local_player = null!;
 
 	protected Pathfinding pathf = new Pathfinding();
-	protected List<Point>? path = null;
+	protected List<Vector2>? path = null;
 
 	public bool isActionInProgress = false;
 	internal float aiming_rotation;
@@ -22,9 +24,9 @@ public class Enemy : Entity{
 	public float tStun = 1;
 	
 	public bool hasPosTarget=false;
-	public PointF posTarget = new PointF();
+	public Vector2 posTarget = new Vector2();
  
-	protected List<PointF>? currentPath = null;
+	protected List<Vector2>? currentPath = null;
 	DateTime dtRefreshPath=DateTime.Now;
 
 	private int damage = 5;
@@ -54,12 +56,12 @@ public class Enemy : Entity{
 			currentPath = pathf.FindPath((int)this.X, (int)this.Y, (int)target.X, (int)target.Y); 
 		}
 
-		PointF nextPoint = target.center; 
+		Vector2 nextPoint = target.center; 
 		if(currentPath != null && currentPath.Count > 0){
 			nextPoint = currentPath[0];
 		}
 		
-		PointF difference = new PointF(this.center.Y-nextPoint.Y,this.center.X-nextPoint.X);
+		Vector2 difference = new Vector2(this.center.Y-nextPoint.Y,this.center.X-nextPoint.X);
 		aiming_rotation = ((float)Math.Atan2(difference.X, difference.Y)*180f)/3.14f+180;
 
 		if(currentPath != null && currentPath.Count > 0 && Math.Abs(this.X - nextPoint.X) < 40 && Math.Abs(this.Y-nextPoint.Y)<40){
@@ -70,7 +72,7 @@ public class Enemy : Entity{
 	public void FaceTarget(){
 		Entity? target = GetNearestPlayer();
 		if(target == null) return;
-		PointF difference = new PointF(this.center.Y-target.center.Y,this.center.X-target.center.X);
+		Vector2 difference = new Vector2(this.center.Y-target.center.Y,this.center.X-target.center.X);
 		aiming_rotation = ((float)Math.Atan2(difference.X, difference.Y)*180f)/3.14f+180;
 		this.rotation = aiming_rotation;
 	}
@@ -109,7 +111,7 @@ public class Enemy : Entity{
 			else return;
 		}
 		
-		float distance = Tools.GetDistanceSquared(target.r.Location, this.r.Location);
+		float distance = Tools.GetDistanceSquared(new Vector2(target.r.X, target.r.Y), new Vector2(this.r.X, this.r.Y));
 		if(distance > 90000){
 			if(_sprite != walk) _sprite = walk;
 			speed = Math.Clamp(speed + 1, -3, 3);
@@ -142,7 +144,7 @@ public class Enemy : Entity{
 		isStunned = true;
 		tStun = 1;
 
-		Blood.SprayBlood(r.Location, new PointF((float)Math.Cos(radians),(float)Math.Sin(radians)));
+		Blood.SprayBlood(new Vector2(r.X, r.Y), new Vector2((float)Math.Cos(radians),(float)Math.Sin(radians)));
 	}
 
 	private Sprite UpdateSprite(){
@@ -210,7 +212,7 @@ public class Enemy : Entity{
 
 		this._friction_turnbased = 0.82f; // Slightly less friction for smoother gliding
 
-		r.Size = new Size(64, 64);
+		r.Width = 64; r.Height = 64;
 		setHealth(100);
 		LoadSprites();
 		_sprite = stand;
@@ -227,3 +229,7 @@ public class Enemy : Entity{
 
 	}
 }
+
+
+
+

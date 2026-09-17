@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 public class Autoaim{
 
 	Entity parent;
@@ -34,7 +36,7 @@ public class Autoaim{
 
 		float dist = Tools.GetDistanceSquared(parent.center, target.center);
 
-		PointF difference = new PointF(parent.center.Y-target.center.Y,parent.center.X-target.center.X);
+		Vector2 difference = new Vector2(parent.center.Y-target.center.Y,parent.center.X-target.center.X);
 		float new_aiming_rotation = ((float)Math.Atan2(difference.X, difference.Y)*180f)/3.14f+180;
 
 		rotation = new_aiming_rotation;
@@ -46,7 +48,7 @@ public class Autoaim{
 	}
 
 	private float AngleDifference(Entity me, Entity other){
-		PointF difference = new PointF(me.center.Y-other.center.Y,me.center.X-other.center.X);
+		Vector2 difference = new Vector2(me.center.Y-other.center.Y,me.center.X-other.center.X);
 		float aimingRotation = ((float)Math.Atan2(difference.X, difference.Y)*180f)/3.14f+180f;
 		return Tools.GetAngleDifference(me.rotation, aimingRotation);
 	}
@@ -90,3 +92,5 @@ public class Autoaim{
 		crosshair.isOn = c;
 	}
 }
+
+

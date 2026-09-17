@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 public class Entity : Object{
 	
 	public bool isAttacking = false;
@@ -55,12 +57,12 @@ public class Entity : Object{
 	public virtual void DropItem(){
 	}
 
-	public Object? HitscanCheck(PointF start, float range, float? angleOverride = null){
+	public Object? HitscanCheck(Vector2 start, float range, float? angleOverride = null){
 		float angle;
 		if(angleOverride != null) angle = angleOverride.Value * 0.0174533f;
 		else angle = this.rotation*0.0174533f;
 
-		PointF targetPoint = start;
+		Vector2 targetPoint = start;
 		for (float d = 0; d < range; d += 16){
 			targetPoint.X = start.X + (float)Math.Cos(angle) * d;
 			targetPoint.Y = start.Y + (float)Math.Sin(angle) * d;
@@ -86,7 +88,7 @@ public class Entity : Object{
 			}
 		}
 
-		Game.draw.DebugSetLine(start, targetPoint);
+		
 		if(closestHit != null){
 			return closestHit;
 		}
@@ -110,3 +112,6 @@ public class Entity : Object{
 		IsHit(damage, rotation);
 	}
 }
+
+
+

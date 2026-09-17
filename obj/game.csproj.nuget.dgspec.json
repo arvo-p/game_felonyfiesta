@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\MYHOME\\HEL\\Csharp\\game\\game.csproj": {}
+    "C:\\MYHOME\\HEL\\Z.Deuxième_Année\\Csharp\\game\\game.csproj": {}
   },
   "projects": {
-    "C:\\MYHOME\\HEL\\Csharp\\game\\game.csproj": {
+    "C:\\MYHOME\\HEL\\Z.Deuxième_Année\\Csharp\\game\\game.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\MYHOME\\HEL\\Csharp\\game\\game.csproj",
+        "projectUniqueName": "C:\\MYHOME\\HEL\\Z.Deuxième_Année\\Csharp\\game\\game.csproj",
         "projectName": "game",
-        "projectPath": "C:\\MYHOME\\HEL\\Csharp\\game\\game.csproj",
+        "projectPath": "C:\\MYHOME\\HEL\\Z.Deuxième_Année\\Csharp\\game\\game.csproj",
         "packagesPath": "C:\\Users\\gsppe\\.nuget\\packages\\",
-        "outputPath": "C:\\MYHOME\\HEL\\Csharp\\game\\obj\\",
+        "outputPath": "C:\\MYHOME\\HEL\\Z.Deuxième_Année\\Csharp\\game\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -49,6 +49,12 @@
       "frameworks": {
         "net9.0-windows7.0": {
           "targetAlias": "net9.0-windows",
+          "dependencies": {
+            "Raylib-cs": {
+              "target": "Package",
+              "version": "[8.1.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -63,9 +69,6 @@
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
-            },
-            "Microsoft.WindowsDesktop.App.WindowsForms": {
-              "privateAssets": "none"
             }
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"

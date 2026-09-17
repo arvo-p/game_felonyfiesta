@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 using System.Media;
 
 public class Dialogue{
@@ -32,3 +34,4 @@ public class Dialogue{
 		isPlaying = false;
 	}
 }
+

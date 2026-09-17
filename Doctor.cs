@@ -1,10 +1,12 @@
+using System.Numerics;
+using Raylib_cs;
 public class Doctor : Enemy{
  	public Doctor(){
     	Init();
 	}
 
-	public Doctor(PointF pos){
-		r.Location = pos;
+	public Doctor(Vector2 pos){
+		r.X = (pos).X; r.Y = (pos).Y;
 		Init();
 	}
 
@@ -19,3 +21,7 @@ public class Doctor : Enemy{
 		dead = new Sprite(Resources.Doctor._death, -1, 4);
 	}
 }
+
+
+
+

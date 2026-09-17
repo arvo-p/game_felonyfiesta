@@ -1,12 +1,15 @@
-using System.Drawing.Text;
+using System.Numerics;
+using Raylib_cs;
+
 
 public class Resources{
 	public static string root = "Resources";
 	
 	public static class Font{
-		public static PrivateFontCollection _pfc = new PrivateFontCollection();
+		public static Raylib_cs.Font _pfc;
 		public static void Load(){
-			_pfc.AddFontFile(root+"/Font/bank gothic medium bt.ttf");
+			// Replaced with Raylib Font
+			// _pfc = Raylib.LoadFont(root+"/Font/bank gothic medium bt.ttf");
 		}
 	}
 
@@ -369,3 +372,5 @@ public class Resources{
 		};
 	}
 }
+
+

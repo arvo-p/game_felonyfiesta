@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 
 using System.Collections;
 using System.Collections.Generic;
@@ -68,3 +70,4 @@ public class ObjectsManager : IEnumerable<Object>
         }
     }
 }
+

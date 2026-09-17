@@ -1,3 +1,5 @@
+using System.Numerics;
+using Raylib_cs;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,3 +51,4 @@ public class EntityManager : IEnumerable<Entity>
         }
     }
 }
+

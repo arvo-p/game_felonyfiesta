@@ -1,9 +1,17 @@
+using System.Numerics;
+using Raylib_cs;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Raylib_cs;
+
 public class Sprite{
-	List<Image> frames = new List<Image>();
+	List<Texture2D> frames = new List<Texture2D>();
 	public string[]? frames_src;
-	int index=0;
-	int length=0;
-	int slothFactor=1;
+	int index = 0;
+	int length = 0;
+	int slothFactor = 1;
 
 	bool _isInfiniteLoop = true;
 	bool isAnimationTriggered = false;
@@ -13,7 +21,7 @@ public class Sprite{
 	public bool isInfiniteLoop{get => _isInfiniteLoop;}
 	public bool isAnimationFinished{get => _isAnimationFinished;}
 
-	public Image frame{
+	public Texture2D frame{
 		get{
 			if(length == 0) return frames[0];
 
@@ -36,8 +44,7 @@ public class Sprite{
 		this.frames_src = filepaths;
 		foreach(string pre_filepath in filepaths){
 			string filepath = Resources.root + "/" + pre_filepath;
-			Image i = Image.FromStream(new MemoryStream(File.ReadAllBytes(filepath)));
-			frames.Add(i);
+			frames.Add(GetImage(pre_filepath));
 		}
 
 		length = frames.Count;
@@ -47,9 +54,7 @@ public class Sprite{
 
 	public Sprite(string pre_filepath){
 		this.frames_src = new string[]{pre_filepath};
-		string filepath = Resources.root + "/" + pre_filepath;
-		Image i = Image.FromStream(new MemoryStream(File.ReadAllBytes(filepath)));
-		frames.Add(i);
+		frames.Add(GetImage(pre_filepath));
 		length = 1;
 	}
 
@@ -59,9 +64,7 @@ public class Sprite{
 		this.restingframe_idx = restingframe_idx;
 
 		foreach(string pre_filepath in filepaths){
-			string filepath = Resources.root + "/" + pre_filepath;
-			Image i = Image.FromStream(new MemoryStream(File.ReadAllBytes(filepath)));
-			frames.Add(i);
+			frames.Add(GetImage(pre_filepath));
 		}
 
 		length = frames.Count;
@@ -69,15 +72,16 @@ public class Sprite{
 		if(restingframe_idx == -1) this.restingframe_idx = length-1;
 	}
 
-	private static Dictionary<string, Image> _imageLibrary = new Dictionary<string, Image>();
+	private static Dictionary<string, Texture2D> _imageLibrary = new Dictionary<string, Texture2D>();
 	
-	public static Image GetImage(string filepath){
-		filepath = Resources.root + "/" + filepath;
+	public static Texture2D GetImage(string filepath){
+		// When called from external places or directly from Sprite, we assume we might need to prepend Resources.root if it doesn't have it
+		string fullPath = filepath.StartsWith(Resources.root) ? filepath : Resources.root + "/" + filepath;
 		
-		if (!_imageLibrary.ContainsKey(filepath))
-			_imageLibrary[filepath] = Image.FromStream(new MemoryStream(File.ReadAllBytes(filepath)));
+		if (!_imageLibrary.ContainsKey(fullPath))
+			_imageLibrary[fullPath] = Raylib.LoadTexture(fullPath);
 
-		return _imageLibrary[filepath];
+		return _imageLibrary[fullPath];
 	}
 
 	public Sprite(string[] filepaths, int restingframe_idx, int slothFactor, bool infinite){
@@ -118,3 +122,5 @@ public class Sprite{
 		NextFunction();
 	}
 }
+
+

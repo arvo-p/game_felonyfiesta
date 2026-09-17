@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "usQOL5PITZY=",
+  "dgSpecHash": "IPPuiUIRdG4=",
   "success": true,
-  "projectFilePath": "C:\\MYHOME\\HEL\\Csharp\\game\\game.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\MYHOME\\HEL\\Z.Deuxième_Année\\Csharp\\game\\game.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\gsppe\\.nuget\\packages\\raylib-cs\\8.1.0\\raylib-cs.8.1.0.nupkg.sha512"
+  ],
   "logs": []
 }

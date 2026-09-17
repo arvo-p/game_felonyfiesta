@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using System.Drawing;
+using System.Numerics;
+using Raylib_cs;
 using System.Linq;
 
 public class Pathfinding{
@@ -21,13 +22,13 @@ public class Pathfinding{
 
 	public Pathfinding(){
 		map = Game.env.map;
-		mapWidth = map.mapsize.Width; 
-		mapHeight = map.mapsize.Height; 
+		mapWidth = map.mapsize.X; 
+		mapHeight = map.mapsize.Y; 
 		tileSize = map.tileDimension;
 		collision = map.collision;
 	}
 
-	public List<PointF>? FindPath(int startX, int startY, int targetX, int targetY) {
+	public List<Vector2>? FindPath(int startX, int startY, int targetX, int targetY) {
 		if (startX < 0 || startX >= collision.GetLength(0) || startY < 0 || startY >= collision.GetLength(1)) return null;
 		if (targetX < 0 || targetX >= collision.GetLength(0) || targetY < 0 || targetY >= collision.GetLength(1)) return null;
 		if (collision[targetX, targetY] != -1) return null;
@@ -115,15 +116,17 @@ public class Pathfinding{
 		return 14 * dstX + 10 * (dstY - dstX);
 	}
 
-	private List<PointF> RetracePath(Node startNode, Node endNode) {
-		List<PointF> path = new List<PointF>();
+	private List<Vector2> RetracePath(Node startNode, Node endNode) {
+		List<Vector2> path = new List<Vector2>();
 		Node currentNode = endNode;
 
 		while (currentNode != startNode) {
-			path.Add(new PointF(currentNode.X * map.tileRenderDimension + map.tileRenderDimension / 2, currentNode.Y * map.tileRenderDimension + map.tileRenderDimension / 2));
+			path.Add(new Vector2(currentNode.X * map.tileRenderDimension + map.tileRenderDimension / 2, currentNode.Y * map.tileRenderDimension + map.tileRenderDimension / 2));
 			currentNode = currentNode.Parent;
 		}
 		path.Reverse();
 		return path;
 	}
 }
+
+

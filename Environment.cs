@@ -1,4 +1,6 @@
-using System.Drawing.Drawing2D;
+using System.Numerics;
+using Raylib_cs;
+
 
 public class Environment{
 
@@ -22,14 +24,15 @@ public class Environment{
 		crosshair = new Crosshair(Resources.UI._crosshair1,Resources.UI._crosshair2);
 		levelManager = new LevelManager();
 		
-		// Initial spawn point for the squad
-		PointF baseSpawn = levelManager.SpawnCoordinates(new PointF(2000, 2000), 1000);
+		// Initial spawn Vector2 for the squad
+		Vector2 baseSpawn = levelManager.SpawnCoordinates(new Vector2(2000, 2000), 1000);
 
 		for(int i = 0; i < playerCount; i++){
 			Player p = new Player(crosshair);
 
-			PointF pSpawn = levelManager.SpawnCoordinates(baseSpawn, 150);
-			p.r.Location = pSpawn;
+			Vector2 pSpawn = levelManager.SpawnCoordinates(baseSpawn, 150);
+			p.r.X = pSpawn.X;
+			p.r.Y = pSpawn.Y;
 			p.PositionUpdated();
 			p.SetCollisionCircles();
 
@@ -57,32 +60,32 @@ public class Environment{
 
 	private const float DegToRad = MathF.PI / 180f;
 
-	private int ResolveRectangleTileCollision(RectangleF rect){
+	private int ResolveRectangleTileCollision(Rectangle rect){
 		// Check the four corners with a small inner padding to avoid edge snagging
 		const float padding = 8f;
-		PointF[] pointsToCheck = {
-			new PointF(rect.Left + padding, rect.Top + padding),
-			new PointF(rect.Left + padding, rect.Bottom - padding),
-			new PointF(rect.Right - padding, rect.Top + padding),
-			new PointF(rect.Right - padding, rect.Bottom - padding)
+		Vector2[] pointsToCheck = {
+			new Vector2(rect.X + padding, rect.Y + padding),
+			new Vector2(rect.X + padding, (rect.Y + rect.Height) - padding),
+			new Vector2((rect.X + rect.Width) - padding, rect.Y + padding),
+			new Vector2((rect.X + rect.Width) - padding, (rect.Y + rect.Height) - padding)
 		};
 		
-		foreach(var point in pointsToCheck){
-			var tile = map.GetTileFromCoordinates(point);
+		foreach(var Vector2 in pointsToCheck){
+			var tile = map.GetTileFromCoordinates(Vector2);
 			if(tile.x == -1 || map.collision[tile.x, tile.y] == 1) return 1;
 		}	
 
 		return 0;
 	}
 
-	public PointF CheckRectangleTileCollision(CollisionCircle cc, PointF movement){
+	public Vector2 CheckRectangleTileCollision(CollisionCircle cc, Vector2 movement){
 		float size = cc.radius * 2;
 		
 		// Separate X and Y checks allow for sliding along walls
-		RectangleF futureX = new RectangleF(cc.center.X - cc.radius + movement.X, cc.center.Y - cc.radius, size, size);
+		Rectangle futureX = new Rectangle(cc.center.X - cc.radius + movement.X, cc.center.Y - cc.radius, size, size);
 		if(ResolveRectangleTileCollision(futureX) == 1) movement.X = 0;
 
-		RectangleF futureY = new RectangleF(cc.center.X - cc.radius, cc.center.Y - cc.radius + movement.Y, size, size);
+		Rectangle futureY = new Rectangle(cc.center.X - cc.radius, cc.center.Y - cc.radius + movement.Y, size, size);
 		if(ResolveRectangleTileCollision(futureY) == 1) movement.Y = 0; 
 		
 		return movement;
@@ -92,20 +95,20 @@ public class Environment{
 		return ResolveCircleTileCollision(cc.center, cc.radius, tilex, tiley, cc.parent, mode);
 	}
 
-	private bool ResolveCircleTileCollision(PointF center, float radius, int tilex, int tiley, Object parent, int mode){
+	private bool ResolveCircleTileCollision(Vector2 center, float radius, int tilex, int tiley, Object parent, int mode){
 		int tileSize = map.tileRenderDimension;
 		
-		PointF closest = new PointF(
+		Vector2 closest = new Vector2(
 			Math.Clamp(center.X, tileSize * tilex, tileSize * (tilex + 1)), 
 			Math.Clamp(center.Y, tileSize * tiley, tileSize * (tiley + 1))
 		);
 		
-		PointF offset = new PointF(center.X - closest.X, center.Y - closest.Y);
+		Vector2 offset = new Vector2(center.X - closest.X, center.Y - closest.Y);
 		float distSq = offset.X * offset.X + offset.Y * offset.Y;
 
 		// Handle cases where center is exactly on the edge/corner
 		if(distSq == 0) {
-			offset = new PointF(0, -1); 
+			offset = new Vector2(0, -1); 
 			distSq = 1;
 		}
 
@@ -113,7 +116,7 @@ public class Environment{
 			if(parent == null) return true;
 			
 			var overlapInfo = GetCirclesCollisionOverlap(offset, distSq, radius, 0); 
-			PointF pushOut = new PointF(overlapInfo.direction.X * (overlapInfo.overlap + 0.2f), overlapInfo.direction.Y * (overlapInfo.overlap + 0.2f));
+			Vector2 pushOut = new Vector2(overlapInfo.direction.X * (overlapInfo.overlap + 0.2f), overlapInfo.direction.Y * (overlapInfo.overlap + 0.2f));
 			
 			/* 
 			 * Mode 0 handles translation
@@ -146,7 +149,7 @@ public class Environment{
 		return false;
 	}
 
-	public bool CheckCircleTileCollision(CollisionCircle cc, PointF mov, int mode){
+	public bool CheckCircleTileCollision(CollisionCircle cc, Vector2 mov, int mode){
 		float tileSize = map.tileRenderDimension;
 		
 		// Determine tile range to check
@@ -169,11 +172,11 @@ public class Environment{
 		return false;
 	}
 
-	private (float overlap, PointF direction, float distance) GetCirclesCollisionOverlap(PointF direction, float distSq, float r1, float r2){
+	private (float overlap, Vector2 direction, float distance) GetCirclesCollisionOverlap(Vector2 direction, float distSq, float r1, float r2){
 		float distance = MathF.Sqrt(distSq); 
 		
 		if (distance == 0){
-			direction = new PointF(1, 0);
+			direction = new Vector2(1, 0);
 			distance = 1;
 		}
 		
@@ -184,8 +187,8 @@ public class Environment{
 		return (overlap, direction, distance);
 	}
  
-	private (float overlap, PointF direction) GetCirclesCollisionOverlap(CollisionCircle h1, CollisionCircle h2){
-		PointF diff = new PointF(h1.center.X - h2.center.X, h1.center.Y - h2.center.Y);
+	private (float overlap, Vector2 direction) GetCirclesCollisionOverlap(CollisionCircle h1, CollisionCircle h2){
+		Vector2 diff = new Vector2(h1.center.X - h2.center.X, h1.center.Y - h2.center.Y);
 		float distSq = diff.X * diff.X + diff.Y * diff.Y; 
 		var r = GetCirclesCollisionOverlap(diff, distSq, h1.radius, h2.radius);
 		return (r.overlap, r.direction);
@@ -196,14 +199,14 @@ public class Environment{
          entity.IsHit((int)(Math.Abs(vehicle.speed) * 2f), vehicle.rotation, vehicle);
     
          float radians = (vehicle.rotation+45) * DegToRad;
-         PointF direction = new PointF(MathF.Cos(radians), MathF.Sin(radians));
-         entity.TransferForce(new PointF(direction.X * vehicle.speed * 0.5f, direction.Y * vehicle.speed * 0.5f), vehicle.mass);
+         Vector2 direction = new Vector2(MathF.Cos(radians), MathF.Sin(radians));
+         entity.TransferForce(new Vector2(direction.X * vehicle.speed * 0.5f, direction.Y * vehicle.speed * 0.5f), vehicle.mass);
          Blood.SprayBlood(entity.center, direction);
     
          vehicle.speed *= 0.9f;
      }
 	
-	public void UpdatePosition(Object target, PointF movement){
+	public void UpdatePosition(Object target, Vector2 movement){
 		target.r.X += movement.X;
 		target.r.Y += movement.Y;
 
@@ -255,7 +258,7 @@ public class Environment{
 
 	private int AdjustCirclesOverlap(Object obj, CollisionCircle h1, CollisionCircle h2, int mode){
 		var r = GetCirclesCollisionOverlap(h1, h2);
-		PointF push = new PointF(r.direction.X * (r.overlap + 0.01f), r.direction.Y * (r.overlap + 0.01f));
+		Vector2 push = new Vector2(r.direction.X * (r.overlap + 0.01f), r.direction.Y * (r.overlap + 0.01f));
 
 		if(mode == 1){ // rotation torque calculation
 			float localX = h1.center.X - obj.X;
@@ -272,9 +275,9 @@ public class Environment{
 		// Maybe try using object's TransferForce function instead, this would
 		// take mass into account.
 		if(h2.parent is not Vehicle)
-			Move(h2.parent, new PointF(-push.X, -push.Y)); 
+			Move(h2.parent, new Vector2(-push.X, -push.Y)); 
 		else
-			Move(h1.parent, new PointF(push.X, push.Y));
+			Move(h1.parent, new Vector2(push.X, push.Y));
 		
 		return 0;
 	}
@@ -289,18 +292,18 @@ public class Environment{
 			return;
 		}
 
-		List<PointF> centers = new List<PointF>();
+		List<Vector2> centers = new List<Vector2>();
 		for(int i = 0; i < hitboxCount; i++){
 			CollisionCircle hitbox = obj.hitboxes[i];
 			float diffHeight = hitbox.offset;
 			double rot_radians = (obj.rotation) * DegToRad; 
 			
-			PointF rotatedcoords = new PointF(
+			Vector2 rotatedcoords = new Vector2(
 				((float)(Math.Sin(-rot_radians) * diffHeight) + hitbox.pcenter.X),
 				((float)(Math.Cos(rot_radians) * diffHeight) + hitbox.pcenter.Y)
 			);
 		
-			if(CheckCircleTileCollision(hitbox, new PointF(rotatedcoords.X - hitbox.center.X, rotatedcoords.Y - hitbox.center.Y), 1)) return; 
+			if(CheckCircleTileCollision(hitbox, new Vector2(rotatedcoords.X - hitbox.center.X, rotatedcoords.Y - hitbox.center.Y), 1)) return; 
 			centers.Add(rotatedcoords);
 		}
 		
@@ -313,14 +316,14 @@ public class Environment{
     	if(obj is Vehicle v) v.ShockDamage();
 	}
 
-	public void Move(Object obj, PointF movement){
+	public void Move(Object obj, Vector2 movement){
 		int countHitboxes = obj.hitboxes.Count;
 
 		if(countHitboxes == 1) {
 			movement = CheckRectangleTileCollision(obj.hitboxes[0], movement);
 		} else {
 			// Separate X and Y checks allow for sliding along walls
-			PointF moveX = new PointF(movement.X, 0);
+			Vector2 moveX = new Vector2(movement.X, 0);
 			foreach(var cc in obj.hitboxes) {
 				if(CheckCircleTileCollision(cc, moveX, 0)) {
 					movement.X = 0;
@@ -328,7 +331,7 @@ public class Environment{
 				}
 			}
 
-			PointF moveY = new PointF(0, movement.Y);
+			Vector2 moveY = new Vector2(0, movement.Y);
 			foreach(var cc in obj.hitboxes) {
 				if(CheckCircleTileCollision(cc, moveY, 0)) {
 					movement.Y = 0;
@@ -349,4 +352,7 @@ public class Environment{
 		return;
 	}
 }
+
+
+
 
