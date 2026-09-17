@@ -1,7 +1,7 @@
 # 🕶️ Felony Fiesta
 ![Capture](capture.PNG)
 
-**Felony Fiesta** est un jeu d'action en vue de dessus (*top-down shooter*) rétro inspiré par **GTA 1**. Développé en **C#** avec **Windows Forms**, ce jeu a été réalisé comme projet final du cours de programmation événementielle.
+**Felony Fiesta** est un jeu d'action en vue de dessus (*top-down shooter*) rétro inspiré par **GTA 1**. Développé en **C#** avec **Raylib**, ce jeu a été réalisé comme projet final du cours de programmation événementielle.
 
 ---
 

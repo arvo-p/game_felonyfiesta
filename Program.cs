@@ -13,7 +13,7 @@ static class Program
         int windowHeight = 512 + 256;
         
         Raylib.InitWindow(windowWidth, windowHeight, "Petty Goober - Raylib");
-        Raylib.SetTargetFPS(60);
+        Raylib.SetTargetFPS(30);
         Raylib.InitAudioDevice();
         
         // Form1 is not used for Game loop now, but Game.Init handles setup.
@@ -30,4 +30,5 @@ static class Program
         Raylib.CloseWindow();
     }    
 }
+
 
